@@ -4,4 +4,4 @@ Keep images small (≲ 1 MB) and record where each came from and its licence. On
 
 | File | Size | Source | Licence |
 |---|---|---|---|
-| | | | |
+| `synthetic_scene.png` | 480 × 300, 11 KB | drawn by `examples/make_sample_image.py` (our code; no photo) | CC0 (ours) |
