@@ -18,7 +18,7 @@ Branches are created by their owners when they start. They don't all need to exi
 
 ## 2. Creating and publishing the repository (FF, one time)
 
-The files are in place, but **git has not been initialised yet and nothing has been pushed**. The set-up tools could not write the `.github/` folder or create git's internal files in this folder, and GitHub CLI was not available or authenticated there. Run these on your Windows machine in PowerShell:
+**Done on 2026-10-27.** FF ran `publish-repo.ps1` (kept outside the repository), which did the steps below: first commit `dd8d114` on `main`, created the **private** repository [Qayzan/CSD3131-Seam-Carving](https://github.com/Qayzan/CSD3131-Seam-Carving), pushed `main` and invited the five teammates. The manual steps are kept here for reference. Run these on your Windows machine in PowerShell:
 
 ```powershell
 cd "C:\Users\fauza\OneDrive\Desktop\School\Y3T1\CSD3131\Assignment\Assignment2\CSD3131-Seam-Carving"
@@ -67,12 +67,14 @@ Or use the web UI: **Settings → Collaborators → Add people**. Each person mu
 
 | Member | GitHub username | Invited | Accepted |
 |---|---|---|---|
-| FF Fauzan | | owner | — |
-| YN Yarni | | ☐ | ☐ |
-| HM Hwee Min | | ☐ | ☐ |
-| WN Wani | | ☐ | ☐ |
-| KO Kervin | | ☐ | ☐ |
-| RB Rifqah | | ☐ | ☐ |
+| FF Fauzan | `Qayzan` | owner | — |
+| YN Yarni | `nursyazliyarni` | ☑ 2026-10-27 | ☐ |
+| HM Hwee Min | `lhweemin` | ☑ 2026-10-27 | ☐ |
+| WN Wani | `waneyyj` | ☑ 2026-10-27 | ☐ |
+| KO Kervin | `kervino` | ☑ 2026-10-27 | ☐ |
+| RB Rifqah | `riffyyyy` | ☑ 2026-10-27 | ☐ |
+
+Usernames were taken from the collaborators of our Assignment 1 repository and invited with write (push) access. Check who has accepted with `gh api repos/Qayzan/CSD3131-Seam-Carving/invitations --jq ".[].invitee.login"` (anyone still listed has not accepted yet).
 
 ## 4. Protecting `main`
 

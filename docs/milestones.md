@@ -11,11 +11,11 @@ Each milestone ends with: files changed, features, tests actually run, known iss
 **Tests run:**
 - Python 3.13 (set-up workspace, fresh venv): `ruff check .` → all checks passed; `ruff format --check .` → 28 files formatted; `pytest` → **10 passed**.
 - Python 3.10.12 (Linux VM on FF's laptop, fresh venv): `ruff check .` → passed; `ruff format --check .` → passed; `pytest` → **10 passed**.
-- `ci.yml` parses as valid YAML. **It has not run on GitHub yet**, because the repository is not published.
+- `ci.yml` parses as valid YAML. Its first run on GitHub (triggered by the push of `main`) has not been checked yet.
 
 **Known issues / pending:**
-- Git not initialised and nothing published yet. The steps are in `docs/git_workflow.md` §2.
-- `.github/` has to be copied in by hand (see §2, step 0).
+- ~~Git not initialised and nothing published yet.~~ Done 2026-10-27: private repository `Qayzan/CSD3131-Seam-Carving` created, `main` pushed (commit `dd8d114`, 38 files), five teammates invited. Invitations not yet accepted.
+- First CI run on GitHub not yet checked (Actions tab).
 - Team names, SIT IDs and team id T11 copied from Assignment 1. Needs confirmation.
 - Branch protection on a private personal repository needs GitHub Pro (Student Pack). See `docs/git_workflow.md` §4.
 - Design decisions awaiting team review: energy function, tie-breaking, removal order, interface signature.
