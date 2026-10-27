@@ -2,7 +2,7 @@
 
 Content-aware image resizing using Dynamic Programming, Greedy Algorithms and Graph Cut — CSD3131 Algorithms Assignment 2 (Team T11, DigiPen Institute of Technology Singapore).
 
-> **Status: Milestone 1 (repository scaffolding).** The package structure, tooling, CI and design documents are in place. The algorithms are not implemented yet. Shared utilities and Question 1 (Dynamic Programming) come next. See [docs/algorithm_design.md](docs/algorithm_design.md).
+> **Status: Milestone 2 (shared utilities).** Image loading/saving, the Sobel energy map, the shared `Seam`/`Orientation` types and seam validation/removal are implemented and tested. Question 1 (Dynamic Programming) and the carving loop come next (Milestone 3). See [docs/milestones.md](docs/milestones.md) and [docs/algorithm_design.md](docs/algorithm_design.md).
 
 ## What is seam carving?
 
@@ -55,7 +55,7 @@ Full names, SIT IDs and open questions are in [docs/team.md](docs/team.md).
 
 **How the pieces connect**
 
-- **Q3 and Q4 plug into the shared code.** Your seam finder takes an energy map and returns a seam in the agreed format. Then the shared carving loop, demos and benchmarks work with it unchanged. The format is in [docs/interfaces.md](docs/interfaces.md). You can start coding against it now. The shared code itself lands in Milestone 2.
+- **Q3 and Q4 plug into the shared code.** Your seam finder takes an energy map and returns a seam in the agreed format. Then the shared carving loop, demos and benchmarks work with it unchanged. The format is in [docs/interfaces.md](docs/interfaces.md). The shared code (`interfaces`, `energy`, `seam_ops`, `image_utils`) is in place from Milestone 2, so you can import it now; `seam_ops.validate_seam(seam, energy.shape, energy=energy)` checks your output against the contract.
 - **Q2 and Q1 share notation.** The DP recurrence in [docs/algorithm_design.md](docs/algorithm_design.md) is the sub-problem structure Q2 asks about. Use the same symbols in the report.
 - **Q5 uses everyone's results.** The timing and seam-energy numbers come from `benchmarks/`, run on all three methods.
 - **Theory and analysis (Q2, Q5)** are Markdown files in `docs/`. They go through branches and pull requests too, so the report has one tidy source.

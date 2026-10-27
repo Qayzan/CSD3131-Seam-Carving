@@ -6,6 +6,8 @@ The brief requires an **AI Usage Declaration** in the report: "specify how AI to
 |---|---|---|---|---|---|---|
 | 2026-10-27 | FF | Claude (Anthropic), Cowork | Design, repository set-up | Read the brief and rubric; proposed the Python/NumPy/OpenCV/pytest architecture; created the repository scaffolding (structure, CI, templates, CONTRIBUTING, docs); drafted the Q1 DP design, shared interface contract and requirement checklist | "CSD3131 Assignment 2 — Fauzan's Dynamic Programming Implementation & GitHub Repository Setup … I am responsible only for Question 1 … establish a professional, scalable GitHub repository and shared project architecture … Begin with Milestone 1." | Worked DP example verified by brute-force enumeration (all 95 seams). Team names/IDs copied from Assignment 1 repo — to be confirmed by the team. Design decisions (energy, tie rule, order of removals) open for team review |
 
+| 2026-10-27 | FF | Claude (Anthropic), Cowork | Implementation, testing | Milestone 2: implemented the shared modules (`interfaces`, `image_utils`, `energy`, `seam_ops`) and their pytest suites, following the design in `algorithm_design.md` and the contract in `interfaces.md` | "Continuing CSD3131 Assignment 2 … start Milestone 2 (shared utilities with tests) on branch feature/ff-dynamic-programming" | Ran ruff and pytest (120 passed). OpenCV energy cross-checked against an independent NumPy implementation and a hand-computed example; seam removal checked against a slow `np.delete` reference; six deliberate bugs injected to confirm the tests catch them |
+
 ## How to write an entry
 
 - **Stage:** design / implementation / testing / debugging / report writing / presentation.

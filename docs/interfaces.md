@@ -1,6 +1,6 @@
-# Shared interface contract (DRAFT — finalised in Milestone 2)
+# Shared interface contract (v1 — implemented in Milestone 2)
 
-This is the agreement that lets FF, HM and WN build their seam finders independently and still plug them into the same carver, tests, benchmarks and demo. **Please review and comment before Milestone 2 code is merged.** After that, changes need a pull request reviewed by FF.
+This is the agreement that lets FF, HM and WN build their seam finders independently and still plug them into the same carver, tests, benchmarks and demo. Sections 1–2 are now implemented in `src/seam_carving/` (Milestone 2); section 3 (`carve`) follows in Milestone 3. **HM and WN: please still review §5 and comment on the Milestone 2 pull request.** Changes after that need a pull request reviewed by FF.
 
 ## 1. Arrays
 
@@ -12,7 +12,7 @@ This is the agreement that lets FF, HM and WN build their seam finders independe
 
 Indexing is always `array[row, col]`. Row 0 is the top row and column 0 is the left column.
 
-## 2. Types (to be implemented in `seam_carving/interfaces.py`)
+## 2. Types (implemented in `seam_carving/interfaces.py`)
 
 ```python
 class Orientation(enum.Enum):
@@ -50,6 +50,37 @@ def find_seam(energy: np.ndarray, orientation: Orientation) -> Seam: ...
 
 Algorithm-specific extras (the DP table M, a residual graph, …) go in optional helper functions or a `debug=True` variant. They are not part of the shared signature.
 
+What the implementation adds to the sketch above:
+
+- `Seam(...)` copies `indices` into a new **read-only `int64`** array, so any integer dtype is accepted (for example the `intp` that `np.argmin` returns). Floats, booleans, empty or 2-D arrays raise `TypeError`/`ValueError` straight away. `energy` is required and stored as a Python `float`.
+- Two seams are equal when orientation, indices and energy are all equal (seams are deliberately unhashable).
+- `len(seam)` is the number of pixels, and `seam.coordinates()` returns `(rows, cols)` for direct indexing: `energy[seam.coordinates()]`.
+
+### Helpers every finder can use (`seam_carving.seam_ops`)
+
+| Function | What it does |
+|---|---|
+| `validate_seam(seam, shape, *, energy=None)` | Raises `ValueError` with a precise message unless the seam fits `shape` (length, range, 8-connectivity). With `energy=` it also checks contract rule 3 (`seam.energy` equals the sum along the seam). Returns `None` when valid. |
+| `seam_energy(energy, seam)` | Sum of the energy map along the seam (Python `float`). |
+| `seam_mask(shape, seam)` | Boolean `(H, W)` mask, `True` exactly on the seam. |
+| `remove_seam(image, seam)` | New array one column (vertical) or row (horizontal) smaller; dtype, channels and the order of all other pixels kept. |
+| `highlight_seam(image, seam, colour=(255, 0, 0))` | RGB `uint8` copy with the seam painted, for figures and the demo. |
+
+Energy and images: `energy.gradient_energy(image)` gives the `float64 (H, W)` map; `image_utils.load_image` / `save_image` handle files (RGB inside the package, BGR only on disk).
+
+**Quick self-check for HM / WN** (put it in your tests):
+
+```python
+from seam_carving.energy import gradient_energy
+from seam_carving.interfaces import Orientation
+from seam_carving.seam_ops import validate_seam
+
+energy = gradient_energy(image)
+for orientation in Orientation:
+    seam = find_seam(energy, orientation)
+    validate_seam(seam, energy.shape, energy=energy)  # raises if anything is off
+```
+
 ## 3. Results of a full resize
 
 ```python
@@ -73,4 +104,4 @@ Timings use `time.perf_counter()` around the finder call only, measured by the c
 ## 5. Questions for reviewers
 
 - HM / WN: is `find_seam(energy, orientation)` enough for your algorithm? Graph cut may prefer the image for forward energy. If so, we add an optional `image=` keyword rather than changing the shared signature.
-- Should `Seam.indices` be `int64` or `intp`? Proposed: `int64` everywhere for predictable serialisation.
+- ~~Should `Seam.indices` be `int64` or `intp`?~~ Implemented as `int64` (any integer input is converted), for predictable serialisation. Shout if this causes trouble.

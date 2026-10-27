@@ -6,7 +6,7 @@ Taken from `Assignment 2.pdf` (100 marks + 10 bonus) and `Rubrics.pdf`. Requirem
 
 | ID | Requirement (brief item) | Owner | Where it will live |
 |---|---|---|---|
-| R1a | **Q1(a)** Energy map per pixel: gradient (intensity difference between neighbours) or a filter such as Sobel | FF | `energy.py`, `tests/test_energy.py` |
+| R1a | **Q1(a)** Energy map per pixel: gradient (intensity difference between neighbours) or a filter such as Sobel | FF | `energy.py`, `tests/test_energy.py` ✅ (Milestone 2) |
 | R1b | **Q1(b)** Dynamic programming finds the minimum-cumulative-energy seam, **vertical and horizontal** | FF | `dynamic_programming.py`, `tests/test_dynamic_programming.py` |
 | R1c | **Q1(c)** Remove the seam, **recalculate the energy map**, repeat until the target size | FF | `seam_ops.py`, `carver.py`, `tests/test_integration.py` |
 | R2a-i | **Q2(a)(i)** Show the number of seams grows at least exponentially in m (n > 1) | YN | `docs/theory/` → report |
