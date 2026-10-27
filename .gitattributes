@@ -1,0 +1,13 @@
+# Normalise line endings so Windows and Linux/macOS teammates produce identical diffs.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.bmp binary
+*.pdf binary
+*.docx binary
+*.pptx binary
