@@ -8,26 +8,67 @@ Content-aware image resizing using Dynamic Programming, Greedy Algorithms and Gr
 
 Seam carving (Avidan & Shamir, 2007) shrinks an image by repeatedly removing a **seam**: a connected path of pixels with one pixel per row (vertical seam) or per column (horizontal seam). It removes the seam whose total **energy** (how much the pixels stand out from their neighbours) is lowest. Low-energy regions such as sky or plain walls disappear first, and important objects keep their shape. Plain scaling squashes those objects, and cropping cuts them off.
 
-The assignment compares three ways to find the minimum-energy seam:
+The assignment compares three ways to find the minimum-energy seam (Q1, Q3, Q4), plus theory, analysis and a quiz.
 
-| Question | Approach | Owner |
-|---|---|---|
-| Q1 | Dynamic Programming (vertical + horizontal seams, repeated resizing) | FF — Fauzan Fauzy |
-| Q2 | Theory: exponential number of seams, sub-problem structure, divide & conquer for convolution | YN — Yarni |
-| Q3 | Greedy (row-by-row local choice) | HM — Hwee Min |
-| Q4 | Graph Cut (min s–t cut / max-flow) | WN — Wani |
-| Q5 | Analysis and discussion (complexity, comparison, improvements) | KO — Kervin Ong |
-| Q6 | Team project quiz (Week 13) — coordination / preparation | RB — Rifqah Batrisya |
+## Who does what
 
-The full ownership table and member SIT IDs are in [docs/team.md](docs/team.md).
+| Member | GitHub | Question | Your branch | Where your work goes |
+|---|---|---|---|---|
+| FF — Muhammad Fauzan | `Qayzan` | **Q1** Dynamic Programming (vertical + horizontal seams, repeated resizing). Also the shared code everyone uses and repo upkeep | `feature/ff-dynamic-programming` | `src/seam_carving/dynamic_programming.py`, shared modules (`image_utils`, `energy`, `interfaces`, `seam_ops`, `carver`), `tests/` |
+| YN — Yarni | `nursyazliyarni` | **Q2** Theory: why the number of seams is exponential, how the problem splits into sub-problems, divide & conquer for convolution | `docs/yn-theory` | `docs/theory/` |
+| HM — Hwee Min | `lhweemin` | **Q3** Greedy (choose the cheapest next pixel row by row) and its comparison with DP | `feature/hm-greedy` | `src/seam_carving/greedy.py`, `tests/test_greedy.py` |
+| WN — Wani | `waneyyj` | **Q4** Graph Cut (min s–t cut / max-flow) and its comparison with DP | `feature/wn-graph-cut` | `src/seam_carving/graph_cut.py`, `tests/test_graph_cut.py` |
+| KO — Kervin | `kervino` | **Q5** Analysis and discussion: complexity, comparing the three methods, improvements | `docs/ko-analysis` | `docs/analysis/` (uses results from `benchmarks/`) |
+| RB — Rifqah | `riffyyyy` | **Q6** Team project quiz (Week 13): coordination and preparation, details to be agreed | `docs/rb-coordination` | to be agreed |
+
+Full names, SIT IDs and open questions are in [docs/team.md](docs/team.md).
+
+## How each person works on their question
+
+**The idea in plain words.** `main` is the team's clean, working copy. Nobody edits it directly. Each person gets their own **branch**: a private copy where you can change things without affecting anyone else. When your part works, you open a **pull request (PR)**, which asks to merge your branch into `main`. GitHub then runs the checks automatically (lint and tests, called **CI**). A teammate looks it over, and then it is merged. Because everyone works in different files, people almost never step on each other.
+
+**One-time set-up**
+
+1. Accept the invitation: check your email, or go to https://github.com/Qayzan/CSD3131-Seam-Carving/invitations.
+2. Clone the repository and install everything. Follow [Quick start](#quick-start) below.
+3. Create your branch from the table above and publish it:
+
+   ```bash
+   git switch -c feature/hm-greedy        # use YOUR branch name
+   git push -u origin feature/hm-greedy
+   ```
+
+**Every time you work**
+
+1. Bring your branch up to date with the latest `main`:
+
+   ```bash
+   git switch main && git pull
+   git switch feature/hm-greedy && git merge main
+   ```
+
+2. Edit **only the files in your row** of the table. If you need a change in someone else's file, ask them or open an issue.
+3. Save your progress with small commits: `git add <files>` then `git commit -m "Greedy: pick lowest of three neighbours"`.
+4. Before pushing, run the checks: `ruff check .`, `ruff format .`, `pytest`.
+5. Push: `git push`. When a piece is ready, open a pull request into `main` (`gh pr create --base main --fill`, or the green button on GitHub) and fill in the checklist.
+6. Wait for CI to go green and for one teammate's review, then merge.
+
+**How the pieces connect**
+
+- **Q3 and Q4 plug into the shared code.** Your seam finder takes an energy map and returns a seam in the agreed format. Then the shared carving loop, demos and benchmarks work with it unchanged. The format is in [docs/interfaces.md](docs/interfaces.md). You can start coding against it now. The shared code itself lands in Milestone 2.
+- **Q2 and Q1 share notation.** The DP recurrence in [docs/algorithm_design.md](docs/algorithm_design.md) is the sub-problem structure Q2 asks about. Use the same symbols in the report.
+- **Q5 uses everyone's results.** The timing and seam-energy numbers come from `benchmarks/`, run on all three methods.
+- **Theory and analysis (Q2, Q5)** are Markdown files in `docs/`. They go through branches and pull requests too, so the report has one tidy source.
+
+More detail (rules, commit messages, code style) is in [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/git_workflow.md](docs/git_workflow.md).
 
 ## Quick start
 
 Requires **Python 3.10+**.
 
 ```bash
-# 1. Clone (after the repository has been published — see docs/git_workflow.md)
-git clone https://github.com/<owner>/CSD3131-Seam-Carving.git
+# 1. Clone (private repository — accept your collaborator invitation first)
+git clone https://github.com/Qayzan/CSD3131-Seam-Carving.git
 cd CSD3131-Seam-Carving
 
 # 2. Create and activate a virtual environment

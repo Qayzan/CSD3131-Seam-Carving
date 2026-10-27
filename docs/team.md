@@ -2,14 +2,14 @@
 
 > **Please verify.** Full names and SIT IDs are copied from our Assignment 1 repository (`T11-IDs/README.md`). The team ID **T11** is assumed to carry over to Assignment 2. Confirm both before they go on the report cover: the brief requires "team id and team members (with SIT ID)".
 
-| Initials | Member | SIT ID | Responsibility | Branch |
-|---|---|---|---|---|
-| FF | Muhammad Fauzan bin Mohamed Fauzy | 2403386 | **Q1** Dynamic Programming seam carving; repository set-up, shared utilities, integration | `feature/ff-dynamic-programming` |
-| YN | Nur Syazliyarni Binte Zazali (Yarni) | 2402942 | **Q2** Theory — (a)(i) exponential number of seams, (a)(ii) relating to sub-problems, (b) divide & conquer for convolution | `docs/yn-theory` |
-| HM | Lee Hwee Min | 2403441 | **Q3** Greedy algorithm + comparison with DP | `feature/hm-greedy` |
-| WN | Siti Syazwani Binte Jusri (Wani) | 2402594 | **Q4** Graph Cut (min-cut / max-flow) + comparison with DP | `feature/wn-graph-cut` |
-| KO | Kervin Ong Guan Cheng | 2403337 | **Q5** Analysis and discussion — (a) answers to Q2, (b) time/space complexity, (c) comparison, (d) improvements | `docs/ko-analysis` |
-| RB | Rifqah Batrisya Binte Nazarudi | 2401601 | **Q6** Project quiz — coordination / preparation (to be agreed) | `docs/rb-coordination` |
+| Initials | Member | SIT ID | GitHub | Responsibility | Branch |
+|---|---|---|---|---|---|
+| FF | Muhammad Fauzan bin Mohamed Fauzy | 2403386 | `Qayzan` | **Q1** Dynamic Programming seam carving; repository set-up, shared utilities, integration | `feature/ff-dynamic-programming` |
+| YN | Nur Syazliyarni Binte Zazali (Yarni) | 2402942 | `nursyazliyarni` | **Q2** Theory — (a)(i) exponential number of seams, (a)(ii) relating to sub-problems, (b) divide & conquer for convolution | `docs/yn-theory` |
+| HM | Lee Hwee Min | 2403441 | `lhweemin` | **Q3** Greedy algorithm + comparison with DP | `feature/hm-greedy` |
+| WN | Siti Syazwani Binte Jusri (Wani) | 2402594 | `waneyyj` | **Q4** Graph Cut (min-cut / max-flow) + comparison with DP | `feature/wn-graph-cut` |
+| KO | Kervin Ong Guan Cheng | 2403337 | `kervino` | **Q5** Analysis and discussion — (a) answers to Q2, (b) time/space complexity, (c) comparison, (d) improvements | `docs/ko-analysis` |
+| RB | Rifqah Batrisya Binte Nazarudi | 2401601 | `riffyyyy` | **Q6** Project quiz — coordination / preparation (to be agreed) | `docs/rb-coordination` |
 
 ## Open questions for the team
 
