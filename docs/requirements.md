@@ -7,8 +7,8 @@ Taken from `Assignment 2.pdf` (100 marks + 10 bonus) and `Rubrics.pdf`. Requirem
 | ID | Requirement (brief item) | Owner | Where it will live |
 |---|---|---|---|
 | R1a | **Q1(a)** Energy map per pixel: gradient (intensity difference between neighbours) or a filter such as Sobel | FF | `energy.py`, `tests/test_energy.py` ✅ (Milestone 2) |
-| R1b | **Q1(b)** Dynamic programming finds the minimum-cumulative-energy seam, **vertical and horizontal** | FF | `dynamic_programming.py`, `tests/test_dynamic_programming.py` |
-| R1c | **Q1(c)** Remove the seam, **recalculate the energy map**, repeat until the target size | FF | `seam_ops.py`, `carver.py`, `tests/test_integration.py` |
+| R1b | **Q1(b)** Dynamic programming finds the minimum-cumulative-energy seam, **vertical and horizontal** | FF | `dynamic_programming.py`, `tests/test_dynamic_programming.py` ✅ (Milestones 3–4) |
+| R1c | **Q1(c)** Remove the seam, **recalculate the energy map**, repeat until the target size | FF | `seam_ops.py`, `carver.py`, `tests/test_carver.py`, `tests/test_integration.py` ✅ (Milestones 3–4) |
 | R2a-i | **Q2(a)(i)** Show the number of seams grows at least exponentially in m (n > 1) | YN | `docs/theory/` → report |
 | R2a-ii | **Q2(a)(ii)** With energies e[i,j] and seam cost = sum, relate the problem to sub-problems | YN | `docs/theory/` → report |
 | R2b | **Q2(b)** Discuss whether divide & conquer could speed up gradient / Sobel convolution | YN | `docs/theory/` → report |
@@ -19,7 +19,7 @@ Taken from `Assignment 2.pdf` (100 marks + 10 bonus) and `Rubrics.pdf`. Requirem
 | R5c | **Q5(c)** Comparison with greedy and graph cut | KO | `benchmarks/` + report |
 | R5d | **Q5(d)** Improvements, e.g. is the whole DP table needed? Does multithreading help? | KO (+FF for DP) | report |
 | R6 | **Q6** Project quiz, Week 13 Tue 24 Nov: closed book, team-based, 10–20 MCQs on our code and report. A score multiplier may apply (80–100% → 1.00 … < 40% → 0.70) | all (RB coordinates) | — |
-| R7a | **Bonus** Step-by-step visualisation with all seams shown | tbd | `examples/`, possible UI |
+| R7a | **Bonus** Step-by-step visualisation with all seams shown | tbd | `examples/demo_dp.py` (all seams on the original + every step with `--frames`, Milestone 5); a UI is still possible |
 | R7b | **Bonus** User interaction to edit image sizes | tbd | possible UI |
 | R7c | **Bonus** CI/CD | FF | `.github/workflows/ci.yml` ✅ (CI part) |
 | R8 | **Presentation** ≤ 2 min per person, ≤ 12 min total. Demo the app running. Upload a recording (e.g. YouTube) and put the link in the report | all | `docs/presentation/` |

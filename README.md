@@ -2,7 +2,12 @@
 
 Content-aware image resizing using Dynamic Programming, Greedy Algorithms and Graph Cut — CSD3131 Algorithms Assignment 2 (Team T11, DigiPen Institute of Technology Singapore).
 
-> **Status: Milestone 2 (shared utilities).** Image loading/saving, the Sobel energy map, the shared `Seam`/`Orientation` types and seam validation/removal are implemented and tested. Question 1 (Dynamic Programming) and the carving loop come next (Milestone 3). See [docs/milestones.md](docs/milestones.md) and [docs/algorithm_design.md](docs/algorithm_design.md).
+> **Status: Question 1 done (Milestones 2–5).** The shared code (image I/O, Sobel energy, `Seam` types, seam removal, the carving loop) and the Dynamic Programming seam finder are implemented, tested against an exhaustive-search oracle, and demonstrated by `examples/demo_dp.py`. Greedy (Q3) and Graph Cut (Q4) plug into the same carver on their owners' branches. See [docs/milestones.md](docs/milestones.md).
+
+```bash
+python examples/demo_dp.py                       # synthetic scene, 30% narrower; pictures in examples/output/
+python examples/demo_dp.py photo.jpg --width 0.7 --height 0.9 --frames
+```
 
 ## What is seam carving?
 

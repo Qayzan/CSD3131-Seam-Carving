@@ -1,6 +1,6 @@
 # Architecture and Question 1 design
 
-Status: **design proposal (Milestone 1)**. Implementation starts in Milestone 2 (shared utilities) and Milestone 3 (Question 1). Sections marked *decision* are proposals the team can still change before code depends on them.
+Status: **implemented** — shared utilities in Milestone 2, Question 1 (`dynamic_programming.py`, `carver.py`) in Milestone 3, tests in Milestone 4, demo in Milestone 5 (see [milestones.md](milestones.md)). Sections marked *decision* are what the code does now; the team can still ask for changes.
 
 ---
 

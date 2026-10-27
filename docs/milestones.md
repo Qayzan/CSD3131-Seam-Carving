@@ -48,3 +48,46 @@ Each milestone ends with: files changed, features, tests actually run, known iss
 **Requirements covered:** R1a (energy map, Sobel) ✅; R1c groundwork (seam removal and validation; the repeat-until-target loop is Milestone 3); R7c (more tests running in CI).
 
 **Next:** Milestone 3. `dynamic_programming.py` (cumulative table M, int8 back-pointers, leftmost tie-break, horizontal via transpose) and `carver.carve` (energy recomputed before every seam, width first, timings and optional frames), starting with the 4×5 worked example as the first test.
+
+## Milestone 3 — Question 1: DP seam finder and the carving loop (2026-10-27, branch `feature/ff-dynamic-programming`)
+
+**Files changed:** `src/seam_carving/dynamic_programming.py`, `src/seam_carving/carver.py` (placeholders replaced), `src/seam_carving/interfaces.py` and `__init__.py` (docstrings).
+
+**Features:**
+- `dynamic_programming`: `cumulative_energy` (full table M + `int8` back-pointers, for figures and tests); `backtrack`; `find_vertical_seam`, which keeps only the previous row of M plus the back-pointer table (design §2.10 option 2); `find_horizontal_seam` via the transposed energy map; `find_seam(energy, orientation)` as the shared entry point. Each row is computed in one vectorised step; ties go to the leftmost predecessor and the leftmost bottom cell. Energy maps that are not 2-D, empty, non-numeric or contain NaN/∞ are rejected.
+- `carver`: `carve(image, target_height, target_width, finder=None, order=..., keep_frames=..., energy_fn=...)` — recomputes the energy before every seam, hands it to the finder read-only, checks every returned seam (validity, orientation and reported energy), times energy / finder / removal separately, and optionally keeps every frame. Orders: width first (default), height first, alternate. `seams_in_original_coordinates` maps all removed seams back onto the original picture. Shrinking only.
+
+**Tests run:** see Milestone 4 (written and run together).
+
+**Known issues:** enlargement (seam insertion) and the optimal removal order (Avidan & Shamir's transport map) are out of scope (design §2.8).
+
+## Milestone 4 — Tests, including a brute-force oracle (2026-10-27)
+
+**Files changed:** `tests/helpers.py` (oracles), new `tests/test_dynamic_programming.py`, `tests/test_carver.py`, `tests/test_integration.py`.
+
+**What is tested:**
+- **Worked example** (design §2.5): exact table M, the tie at row 1 column 2, seam `[1, 1, 2, 3]`, energy 7, and that the 4×5 grid has exactly 95 seams.
+- **Exhaustive-search oracle** (`brute_force_find_seam`, tries every seam): 150 random integer matrices up to 6×6 (values 0–5, so ties are common) must give *exactly* the same seam in both orientations — this also proves the leftmost tie rule; 60 random real-valued matrices must give the same minimum energy.
+- **Plain-loop reference** of the recurrence: identical M and back-pointer tables on 6 shapes; the memory-saving finder agrees with the full table on 5 shapes.
+- **Edge cases:** uniform energy, a wall with one gap, seams hugging the left/right border, a diagonal valley, an unreachable cheap pixel, 1×1 / 1×n / n×1 maps, non-square maps in both orientations, negative and integer energies, invalid maps.
+- **Contract:** `find_seam` is a `SeamFinder`, does not modify its input, works on read-only input, reports the right energy, is deterministic.
+- **Carver:** exact target sizes for all three orders, greyscale and RGB, invalid targets, removal order, a spy proving the energy is recomputed on the current image before every seam, any finder can be plugged in (a "remove column 0" finder must equal a crop), broken finders (out-of-range seam, wrong energy, wrong orientation, writing to the energy map) are caught, timings and frames, and the original-coordinate mapping.
+- **End to end:** DP and the exhaustive oracle carve **identical images**, seam by seam, through a full repeated resize (12 random images); every seam of a real carve is optimal for the energy at that step; a flat background with a high-contrast object loses only background pixels when the width or height shrinks by 25–30%; PNG round trip.
+
+**Tests run** (Python 3.10.12, NumPy 2.2.6, OpenCV 5.0.0, ruff 0.17.3; Linux VM on FF's laptop): `ruff check .` and `ruff format --check .` pass; `pytest` → **436 passed** in about 2 s (test_dynamic_programming 252, test_carver 44, test_seam_ops 37, test_energy 28, test_image_utils 28, test_interfaces 17, test_integration 16, test_package 10, test_examples 4 — the last file is Milestone 5).
+
+**Mutation check** (by hand, not part of the suite): each of these deliberate bugs made tests fail — left border not +∞ (261 failures), right border 0 instead of +∞ (258), ties to the rightmost predecessor (70), backtracking with the wrong sign (188), rightmost bottom cell (53), horizontal seams without transposing (242), carving the old energy map instead of recomputing it (1, the spy test).
+
+**Speed** (same machine, indicative only — proper benchmarks are Milestone 6): one DP seam on a random 600×800 energy map ≈ 20 ms; in the demo (300×480 → 300×336, 144 seams) ≈ 6.3 ms per seam for the DP, 1.5 s for the whole resize including energy and removal.
+
+## Milestone 5 — Demo (2026-10-27)
+
+**Files changed:** new `examples/demo_dp.py`, `examples/make_sample_image.py`, `assets/images/synthetic_scene.png` (480×300, drawn by our script, CC0), `tests/test_examples.py`; `examples/README.md`, `assets/images/README.md`, `README.md`.
+
+**Features:** one command (`python examples/demo_dp.py [image] --width … --height … [--order …] [--frames]`) saves the energy map, the DP table M as a heat map, the first vertical and horizontal seams, all removed seams drawn on the original picture, the result, a comparison with plain resizing and centre cropping, and (with `--frames`) every step for the video; it prints the timings.
+
+**Tests run:** `tests/test_examples.py` (4 tests, included in the 436 above): the demo writes all 8 pictures and the right number of frames on a small image; the committed sample picture equals the generator's output; target-size parsing. Manually ran `python examples/demo_dp.py --frames` on the sample picture: 144 seams removed, 8 pictures + 145 frames written, outputs checked by eye.
+
+**Observation for the report (Q1/Q5):** on the sample picture the 30% width reduction keeps the sun, tree and roof intact but narrows the house and the mountain sides. Every vertical seam has to cross the picture from top to bottom, and the flat inside of the house wall has low gradient energy, so seams pass through it. Plain resizing squashes everything and the centre crop cuts the sun off. With `--width 0.85` the house is only slightly narrower. Forward energy (Rubinstein et al., 2008) is the known fix and a candidate improvement for Q5(d).
+
+**Next:** push the branch and open the pull request (CI on Python 3.10 and 3.12), team review of `docs/interfaces.md`, then Milestone 6 (benchmarks and optimisation notes for Q5) once the greedy and graph-cut finders exist.

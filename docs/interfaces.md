@@ -1,6 +1,6 @@
 # Shared interface contract (v1 — implemented in Milestone 2)
 
-This is the agreement that lets FF, HM and WN build their seam finders independently and still plug them into the same carver, tests, benchmarks and demo. Sections 1–2 are now implemented in `src/seam_carving/` (Milestone 2); section 3 (`carve`) follows in Milestone 3. **HM and WN: please still review §5 and comment on the Milestone 2 pull request.** Changes after that need a pull request reviewed by FF.
+This is the agreement that lets FF, HM and WN build their seam finders independently and still plug them into the same carver, tests, benchmarks and demo. Sections 1–2 are implemented in `src/seam_carving/` (Milestone 2) and section 3 (`carve`) in Milestone 3. **HM and WN: please still review §5 and comment on the Milestone 2 pull request.** Changes after that need a pull request reviewed by FF.
 
 ## 1. Arrays
 
@@ -92,10 +92,16 @@ class CarveResult:
     frames: list[np.ndarray] | None  # optional intermediate images (visualisation / bonus 7a)
 ```
 
-`carver.carve(image, target_height, target_width, finder, order="width_first", keep_frames=False) -> CarveResult`
+`carver.carve(image, target_height, target_width, finder=None, order="width_first", keep_frames=False, *, energy_fn=gradient_energy) -> CarveResult` (implemented in Milestone 3)
 
-- Raises `ValueError` if a target is larger than the current size, or less than 1.
+- Raises `ValueError` if a target is larger than the current size, or less than 1 (`TypeError` if it is not an integer).
 - Recomputes the energy map before **every** seam (brief R1c).
+- `finder=None` means the DP finder (Q1). Pass `greedy.find_seam` or `graph_cut.find_seam` to compare.
+- `order`: `"width_first"`, `"height_first"` or `"alternate"`.
+- After every finder call the carver checks the contract: the energy map is handed over **read-only** (writing to it raises `ValueError`, rule 1), and `validate_seam(seam, E.shape, energy=E)` checks validity and `Seam.energy` (rules 2–3). A finder that breaks a rule fails immediately with a clear message.
+- `keep_frames=True`: `frames[0]` is the input and `frames[k]` the image after seam k (`len(frames) == len(seams) + 1`).
+- `energy_fn` lets tests count energy recomputations, and lets the report try other energy functions.
+- `carver.seams_in_original_coordinates(original_shape, result.seams)` maps every removed seam back to pixel positions in the original picture (used to draw all seams at once, bonus 7a).
 
 ## 4. Timing
 
