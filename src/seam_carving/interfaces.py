@@ -125,7 +125,7 @@ class SeamFinder(Protocol):
 
 @dataclass
 class CarveResult:
-    """Everything ``carver.carve`` returns (the carver itself arrives in Milestone 3).
+    """Everything ``carver.carve`` returns.
 
     Attributes:
         image: the resized image; same dtype and number of channels as the input.

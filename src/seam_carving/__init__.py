@@ -15,9 +15,9 @@ Module                    Purpose                                 Owner
 ``graph_cut``             Question 4 — min-cut seam finder        WN
 ========================  ======================================  =====================
 
-Milestone 2 implements the shared utilities (``image_utils``, ``energy``, ``interfaces``,
-``seam_ops``). ``carver`` and ``dynamic_programming`` follow in Milestone 3; ``greedy`` and
-``graph_cut`` are written by their owners on their own feature branches.
+Implemented: the shared utilities (``image_utils``, ``energy``, ``interfaces``, ``seam_ops``,
+``carver``) and Question 1 (``dynamic_programming``). ``greedy`` and ``graph_cut`` are written
+by their owners on their own feature branches.
 """
 
 __version__ = "0.1.0"
