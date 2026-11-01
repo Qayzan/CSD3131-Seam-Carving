@@ -1,7 +1,7 @@
 ---
 name: Task
 about: A piece of work for one team member
-title: "[Q?] "
+title: "[Item ?] "
 labels: task
 ---
 

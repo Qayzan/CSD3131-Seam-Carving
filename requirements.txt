@@ -1,5 +1,0 @@
-# Runtime dependencies (keep in sync with [project].dependencies in pyproject.toml).
-# opencv-python-headless has no GUI modules, so it also installs cleanly in CI.
-# If you want cv2.imshow() windows locally, install opencv-python instead (not both).
-numpy>=1.24
-opencv-python-headless>=4.8

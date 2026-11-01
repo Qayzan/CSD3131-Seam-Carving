@@ -1,5 +1,10 @@
-# Question 5 — analysis and discussion (Owner: KO)
+# Analysis and discussion (Question 5)
 
-Space for Q5(a)–(d): answers to Item 2, time/space complexity, comparison of DP / greedy / graph cut, and improvements. Work on the `docs/ko-analysis` branch.
+| Item | Question | Owner |
+|---|---|---|
+| 5, 6, 7 | Q5(a) Answer the Item 2 questions (see [../theory/](../theory/)) | HM, YN, FF |
+| 8 | Q5(b) Time and space complexity | YN (DP part), KO (Graph Cut part) |
+| 9 | Q5(c) Compare DP vs Greedy vs Graph Cut on seams, visual quality and runtime | RB |
+| 10 | Q5(d) Improvements: do you need the whole DP table, does multithreading help? | RB |
 
-Inputs available from Q1: complexity table, DP-table memory options and multithreading discussion in [../algorithm_design.md](../algorithm_design.md) §2.9–2.11. Measured timings will come from `benchmarks/` (Milestone 6).
+RB works on the `docs/rb-analysis-report` branch. Inputs: the DP complexity table, DP-table memory options and multithreading discussion in [../algorithm_design.md](../algorithm_design.md) §2.9–2.11, the Graph Cut design and complexity in §3, and measured timings from HM's benchmark harness in `benchmarks/`.
