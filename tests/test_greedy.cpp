@@ -185,6 +185,106 @@ static void testBadInputThrows() {
     report("values.size() != rows * cols throws", wrongSizeThrows);
 }
 
+// ---- brute-force oracle ------------------------------------------------------------
+
+// Tries every vertical seam that continues from pixel (row, col). Exponential,
+// so only for tiny maps -- that is exactly what item 5 proves.
+static void searchAllSeams(const EnergyMap& map, int row, int col, double sumSoFar,
+                           double& best) {
+    double sum = sumSoFar + map.at(row, col);
+    if (row == map.rows - 1) {
+        best = std::min(best, sum);
+        return;
+    }
+    for (int next = col - 1; next <= col + 1; ++next) {
+        if (next >= 0 && next < map.cols) searchAllSeams(map, row + 1, next, sum, best);
+    }
+}
+
+static double bruteForceMinVertical(const EnergyMap& map) {
+    double best = std::numeric_limits<double>::infinity();
+    for (int col = 0; col < map.cols; ++col) searchAllSeams(map, 0, col, 0.0, best);
+    return best;
+}
+
+static EnergyMap transposeMap(const EnergyMap& map) {
+    EnergyMap t = makeMap(map.cols, map.rows,
+                          std::vector<double>(static_cast<std::size_t>(map.rows * map.cols)));
+    for (int r = 0; r < map.rows; ++r)
+        for (int c = 0; c < map.cols; ++c) t.values[c * map.rows + r] = map.at(r, c);
+    return t;
+}
+
+static void testAgainstBruteForce() {
+    std::mt19937 rng(2026);
+    std::uniform_int_distribution<int> size(1, 6);
+    std::uniform_int_distribution<int> value(0, 9);
+
+    int trials = 500, optimalCount = 0;
+    bool neverBelowOptimum = true;
+    for (int trial = 0; trial < trials; ++trial) {
+        int rows = size(rng), cols = size(rng);
+        std::vector<double> values(static_cast<std::size_t>(rows * cols));
+        for (double& v : values) v = value(rng);
+        EnergyMap map = makeMap(rows, cols, values);
+
+        double optimumV = bruteForceMinVertical(map);
+        double optimumH = bruteForceMinVertical(transposeMap(map));  // horizontal = vertical of the transpose
+        Seam v = greedy::findSeam(map, Orientation::Vertical);
+        Seam h = greedy::findSeam(map, Orientation::Horizontal);
+
+        if (v.energy < optimumV || h.energy < optimumH) neverBelowOptimum = false;
+        if (v.energy == optimumV) ++optimalCount;
+    }
+    report("oracle: greedy energy >= brute-force minimum (500 maps)", neverBelowOptimum);
+    std::cout << "    (greedy was optimal on " << optimalCount << " of " << trials
+              << " random vertical cases)\n";
+}
+
+// ---- seam counting (item 5) -----------------------------------------------------------
+
+// Number of vertical seams in an m x n image, counted row by row:
+// ways[c] = number of seams from the top row that end at column c of the current row.
+static unsigned long long countSeams(int m, int n) {
+    std::vector<unsigned long long> ways(static_cast<std::size_t>(n), 1), next(ways.size());
+    for (int row = 1; row < m; ++row) {
+        for (int c = 0; c < n; ++c) {
+            next[c] = ways[c];
+            if (c > 0) next[c] += ways[c - 1];
+            if (c < n - 1) next[c] += ways[c + 1];
+        }
+        ways.swap(next);
+    }
+    unsigned long long total = 0;
+    for (unsigned long long w : ways) total += w;
+    return total;
+}
+
+static void testSeamCountBound() {
+    // Known value from docs/algorithm_design.md: a 4 x 5 matrix has 95 seams.
+    report("4 x 5 image has exactly 95 seams", countSeams(4, 5) == 95);
+
+    // Item 5: for n >= 2,  n * 2^(m-1) <= #seams <= n * 3^(m-1).
+    bool boundHolds = true;
+    for (int m = 1; m <= 15; ++m) {
+        for (int n = 2; n <= 10; ++n) {
+            unsigned long long count = countSeams(m, n), lower = n, upper = n;
+            for (int k = 1; k < m; ++k) {
+                lower *= 2;
+                upper *= 3;
+            }
+            if (count < lower || count > upper) boundHolds = false;
+        }
+    }
+    report("n*2^(m-1) <= #seams <= n*3^(m-1) for m<=15, 2<=n<=10", boundHolds);
+
+    // For n = 2 the lower bound is exact: 2 * 2^(m-1) = 2^m.
+    bool tightForTwo = true;
+    for (int m = 1; m <= 20; ++m)
+        if (countSeams(m, 2) != (1ULL << m)) tightForTwo = false;
+    report("n = 2: exactly 2^m seams (lower bound is tight)", tightForTwo);
+}
+
 int main() {
     std::cout << "Greedy seam finder tests\n";
     testGreedyFindsOptimum();
@@ -195,6 +295,8 @@ int main() {
     testDegenerateShapes();
     testContractOnRandomMaps();
     testBadInputThrows();
+    testAgainstBruteForce();
+    testSeamCountBound();
 
     if (failures == 0) {
         std::cout << "ALL TESTS PASSED\n";
