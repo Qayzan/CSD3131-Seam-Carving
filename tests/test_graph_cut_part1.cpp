@@ -12,6 +12,7 @@
 //     cl /std:c++17 /EHsc /O2 /W4 /I src\seam_carving tests\test_graph_cut_part1.cpp src\seam_carving\max_flow.cpp src\seam_carving\seam_graph.cpp
 //     .\test_graph_cut_part1.exe
 // Build (g++):
+//     wsl
 //     g++ -O2 -std=c++17 -Wall -Wextra -I src/seam_carving -o test_graph_cut_part1 tests/test_graph_cut_part1.cpp src/seam_carving/max_flow.cpp src/seam_carving/seam_graph.cpp
 //     ./test_graph_cut_part1
 // ============================================================================
