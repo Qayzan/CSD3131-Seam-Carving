@@ -15,6 +15,9 @@
 
 using graphcut::Grid;
 
+// Reference DP computes the minimum possible seam cost.
+// It uses the same scaled energy values as Graph Cut for comparison.
+static long long dpCost(const Grid& energy) {
 static long long dpCost(const Grid& energy) {
     int rows = (int)energy.size(), cols = (int)energy[0].size();
     std::vector<long long> previous(cols), current(cols);

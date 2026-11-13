@@ -37,6 +37,9 @@ std::vector<int> extractVerticalSeam(const SeamGraph& graph) {
     if (reachable[graph.sink])
         throw std::logic_error("Sink is still reachable: run maxFlow before extraction");
 
+    // The minimum cut separates each row into source-side and sink-side pixels.
+    // The rightmost source-side pixel marks where the cut crosses that row,
+    // so its column is the seam position.
     std::vector<int> seam(graph.rows, -1);
     for (int row = 0; row < graph.rows; ++row) {
         for (int col = 0; col < graph.cols; ++col) {
