@@ -14,8 +14,8 @@ The assignment compares three ways to find the minimum-energy seam (DP, Greedy, 
 
 | # | Member | GitHub | Items | Your branch | Where your work goes |
 |---|---|---|---|---|---|
-| 1 | FF — Muhammad Fauzan | `Qayzan` | Shared foundation: energy map (Sobel), seam removal, resize loop, horizontal seams via transpose (1) + Divide-and-Conquer Sobel discussion (7) | `feature/ff-foundation` | `image_utils`, `energy`, `interfaces`, `seam_ops`, `carver`, `src/main.cpp` |
-| 2 | YN — Yarni | `nursyazliyarni` | DP seam carving (2) + DP recurrence (6) + DP complexity (8, DP part) | `feature/yn-dynamic-programming` | `dynamic_programming`, `tests/test_dynamic_programming.cpp` |
+| 1 | FF — Muhammad Fauzan | `Qayzan` | All of Question 1: shared foundation — energy map (Sobel), seam removal, resize loop (1) — and DP seam carving, vertical + horizontal (2) + Divide-and-Conquer Sobel discussion (7) | `feature/ff-foundation` | `image_utils`, `energy`, `interfaces`, `seam_ops`, `carver`, `dynamic_programming`, `src/main.cpp` |
+| 2 | YN — Yarni | `nursyazliyarni` | Question 2 report: DP recurrence (6) + DP complexity (8, DP part) | `docs/yn-theory` | `docs/theory/`, `docs/analysis/` |
 | 3 | HM — Hwee Min | `lhweemin` | Greedy (3) + exponential-seams proof (5) + benchmark harness | `feature/hm-greedy` | `greedy`, `tests/test_greedy.cpp`, `benchmarks/` |
 | 4 | WN — Wani | `waneyyj` | Graph Cut part 1: graph construction + max-flow (4) | `feature/wn-graph-cut` | `seam_graph`, `max_flow`, `tests/test_graph_cut_part1.cpp` |
 | 5 | KO — Kervin | `kervino` | Graph Cut part 2: seam extraction + check against DP (4) + Graph Cut complexity (8, Graph Cut part) | `feature/ko-graph-cut` | `graph_cut`, `tests/test_graph_cut.cpp` |
@@ -98,7 +98,7 @@ CSD3131-Seam-Carving/
 │       ├── interfaces.hpp     # EnergyMap / Seam / Orientation / SeamFinder (1, FF)
 │       ├── seam_ops.cpp       # validate, remove and highlight seams        (1, FF)
 │       ├── carver.cpp         # repeated resizing with any seam finder      (1, FF)
-│       ├── dynamic_programming.cpp  # DP seam finder                        (2, YN)
+│       ├── dynamic_programming.cpp  # DP seam finder                        (2, FF)
 │       ├── greedy.cpp         # greedy seam finder                          (3, HM)
 │       ├── seam_graph.hpp/.cpp      # Graph Cut part 1: graph construction  (4, WN)
 │       ├── max_flow.hpp/.cpp        # Graph Cut part 1: Edmonds-Karp        (4, WN)

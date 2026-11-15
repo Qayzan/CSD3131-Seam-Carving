@@ -7,7 +7,7 @@ Taken from `Assignment 2.pdf` (100 marks + 10 bonus) and `Rubrics.pdf`. Requirem
 | ID | Requirement (brief item) | Item | Owner | Where it will live |
 |---|---|---|---|---|
 | R1a | **Task 1(a)** Energy map per pixel: gradient (intensity difference between neighbours) or a filter such as Sobel | 1 | FF | `energy.cpp`, `tests/test_energy.cpp` ✅ |
-| R1b | **Task 1(b)** Dynamic programming finds the minimum-cumulative-energy seam, **vertical and horizontal** | 2 | YN | `dynamic_programming.cpp`, `tests/test_dynamic_programming.cpp` |
+| R1b | **Task 1(b)** Dynamic programming finds the minimum-cumulative-energy seam, **vertical and horizontal** | 2 | FF | `dynamic_programming.cpp`, `tests/test_dynamic_programming.cpp` ✅ |
 | R1c | **Task 1(c)** Remove the seam, **recalculate the energy map**, repeat until the target size; horizontal seams via transpose | 1 | FF | `seam_ops.cpp`, `carver.cpp`, `tests/test_carver.cpp` ✅ |
 | R2a-i | **Q2(a)(i)** Show the number of seams grows at least exponentially in m (n > 1) | 5 | HM | `docs/theory/` → report |
 | R2a-ii | **Q2(a)(ii)** With energies e[i,j] and seam cost = sum, relate the problem to sub-problems (DP recurrence) | 6 | YN | `docs/theory/` → report |

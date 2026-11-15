@@ -1,6 +1,6 @@
 # Shared interface contract (v1 — implemented on `feature/ff-foundation`)
 
-This is the agreement that lets YN, HM, WN and KO build their seam finders independently and still plug them into the same carver, tests, benchmarks and demo. FF owns the shared foundation (item 1). The real types are in `src/seam_carving/interfaces.hpp`, and the functions are in `image_utils.hpp`, `energy.hpp`, `seam_ops.hpp` and `carver.hpp` (§7 below). Changes need a pull request reviewed by FF.
+This is the agreement that lets FF (DP), HM, WN and KO build their seam finders independently and still plug them into the same carver, tests, benchmarks and demo. FF owns the shared foundation (item 1). The real types are in `src/seam_carving/interfaces.hpp`, and the functions are in `image_utils.hpp`, `energy.hpp`, `seam_ops.hpp` and `carver.hpp` (§7 below). Changes need a pull request reviewed by FF.
 
 ## 1. Data
 
@@ -57,7 +57,7 @@ Rules every seam finder must follow:
 Each algorithm exposes one public entry point with this signature, in its own namespace:
 
 ```cpp
-// dynamic_programming (YN), greedy (HM), graph_cut (KO, using WN's seam_graph + max_flow)
+// dynamic_programming (FF), greedy (HM), graph_cut (KO, using WN's seam_graph + max_flow)
 namespace dp       { Seam findSeam(const EnergyMap& energy, Orientation orientation); }
 namespace greedy   { Seam findSeam(const EnergyMap& energy, Orientation orientation); }
 namespace graphcut { Seam findSeam(const EnergyMap& energy, Orientation orientation); }
@@ -110,7 +110,7 @@ Timings use `std::chrono::steady_clock` around the finder call only, measured by
 
 ## 6. What each finder owner has to do to plug in
 
-- **YN (DP):** add `dynamic_programming.hpp` declaring `namespace dp { Seam findSeam(const EnergyMap&, Orientation); }`, and implement it in `dynamic_programming.cpp`. The demo app and `tests/test_integration.cpp` detect the header and test it automatically against the exhaustive oracle, which must match exactly.
+- **FF (DP):** done. `dynamic_programming.hpp` declares `namespace dp { Seam findSeam(const EnergyMap&, Orientation); }`. The demo app and `tests/test_integration.cpp` detect the header and test it against the exhaustive oracle, which it matches exactly (same seams, same tie rule).
 - **HM (greedy):** delete the temporary `interfaces.hpp` from `feature/hm-greedy` and use this one (same fields, so `greedy.cpp` and `test_greedy.cpp` compile unchanged; checked on an integration branch).
 - **KO (graph cut part 2):** add `graph_cut.hpp` with `namespace graphcut { Seam findSeam(const EnergyMap&, Orientation); }` that builds the `Grid` from the `EnergyMap`, transposes for horizontal seams (`transpose(const EnergyMap&)` in `energy.hpp`) and fills `Seam::energy` (`seamEnergy` in `seam_ops.hpp`). Until then, the demo bridges `findVerticalGraphCutSeam` the same way.
 - **WN (graph cut part 1):** optional. `buildVerticalSeamGraph` can take an `EnergyMap` instead of `Grid`, which saves a copy.
@@ -130,10 +130,13 @@ Timings use `std::chrono::steady_clock` around the finder call only, measured by
 | | `removeSeam(Image or EnergyMap, seam)` | One column or row fewer. Every other pixel kept, in order |
 | | `highlightSeam(image, seam, r, g, b)`, `seamPixels(seam)` | Drawing and coordinates |
 | `carver.hpp` | `carve(...)`, `removalPlan(...)`, `seamsInOriginalCoordinates(...)` | The resize loop (§3) |
+| `dynamic_programming.hpp` | `dp::findSeam(energy, orientation)` | Minimum-energy seam (Task 1(b)), vertical or horizontal (via transpose). Θ(rows·cols) |
+| | `dp::cumulativeEnergy(energy)`, `dp::backtrack(table)` | The DP tables M and back-pointers, and the walk back up (for the report and visualisation) |
+| | `dp::findSeamCompact(energy, orientation)` | Same seam with two rolling rows of M + 1-byte back-pointers (item 10: "do we need the entire DP table?") |
 
-Tests for all of these are in `tests/test_image_utils.cpp`, `test_energy.cpp`, `test_seam_ops.cpp`, `test_carver.cpp` and `test_integration.cpp`. Shared test helpers, including an exhaustive seam oracle anyone can reuse, are in `tests/test_helpers.hpp`. `tests/check.hpp` has `CHECK` macros that keep working in Release builds (unlike `assert`).
+Tests for all of these are in `tests/test_image_utils.cpp`, `test_energy.cpp`, `test_seam_ops.cpp`, `test_carver.cpp`, `test_dynamic_programming.cpp` and `test_integration.cpp`. Shared test helpers, including an exhaustive seam oracle anyone can reuse, are in `tests/test_helpers.hpp`. `tests/check.hpp` has `CHECK` macros that keep working in Release builds (unlike `assert`).
 
 ## 8. Questions for reviewers
 
-- YN / HM / KO: is `findSeam(energy, orientation)` enough for your algorithm? Graph cut may prefer the image for forward energy. If so, we add an overload with an `Image` argument rather than changing the shared signature.
+- HM / KO: is `findSeam(energy, orientation)` enough for your algorithm? Graph cut may prefer the image for forward energy. If so, we add an overload with an `Image` argument rather than changing the shared signature.
 - ~~FF: one flat `std::vector` per map, or `vector<vector<>>`?~~ Decided: flat (implemented).

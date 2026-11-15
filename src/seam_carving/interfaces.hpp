@@ -2,7 +2,7 @@
 // interfaces.hpp  --  the shared types every part of the project uses
 // Owner: FF (Fauzan Fauzy), item 1 (shared foundation).
 //
-// This file is the "contract" from docs/interfaces.md. It lets the DP (YN),
+// This file is the "contract" from docs/interfaces.md. It lets the DP (FF),
 // greedy (HM) and graph-cut (KO/WN) seam finders be written independently and
 // still plug into the same carver, tests, benchmarks and demo app.
 //

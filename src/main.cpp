@@ -36,7 +36,7 @@
 #include "seam_ops.hpp"
 
 #if __has_include("dynamic_programming.hpp")
-#include "dynamic_programming.hpp"  // YN: namespace dp { Seam findSeam(...); }
+#include "dynamic_programming.hpp"  // FF: namespace dp { Seam findSeam(...); }
 #define HAVE_DP 1
 #endif
 #if __has_include("greedy.hpp")
@@ -81,7 +81,7 @@ Seam graphCutViaExtraction(const EnergyMap& energy, Orientation orientation) {
 std::vector<Algorithm> availableAlgorithms() {
     std::vector<Algorithm> algorithms;
 #ifdef HAVE_DP
-    algorithms.push_back({"dp", dp::findSeam, "dynamic programming (YN), optimal seam, Theta(rows*cols) per seam"});
+    algorithms.push_back({"dp", dp::findSeam, "dynamic programming (FF), optimal seam, Theta(rows*cols) per seam"});
 #endif
 #ifdef HAVE_GREEDY
     algorithms.push_back({"greedy", greedy::findSeam, "greedy (HM), cheapest neighbour row by row, not always optimal"});
@@ -151,7 +151,7 @@ int listAlgorithms() {
     const auto algorithms = availableAlgorithms();
     if (algorithms.empty()) {
         std::cout << "No seam-finding algorithm is compiled into this build yet.\n"
-                     "They arrive when merged: DP (YN), greedy (HM), graph cut (KO + WN).\n";
+                     "They arrive when merged: DP (FF), greedy (HM), graph cut (KO + WN).\n";
         return 0;
     }
     for (const Algorithm& algorithm : algorithms)
@@ -226,7 +226,7 @@ int main(int argc, char** argv) {
         const auto algorithms = availableAlgorithms();
         if (algorithms.empty()) {
             std::cerr << "No seam-finding algorithm is compiled into this build yet, so nothing can be\n"
-                         "resized. They arrive when merged: DP (YN), greedy (HM), graph cut (KO + WN).\n"
+                         "resized. They arrive when merged: DP (FF), greedy (HM), graph cut (KO + WN).\n"
                          "Try --bench-sobel, or --list after merging.\n";
             return 2;
         }
