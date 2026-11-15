@@ -30,7 +30,8 @@ inline Image makeImageFrom(int rows, int cols, int channels, const std::vector<i
     image.rows = rows;
     image.cols = cols;
     image.channels = channels;
-    image.pixels.assign(values.begin(), values.end());
+    image.pixels.reserve(values.size());
+    for (const int v : values) image.pixels.push_back(static_cast<std::uint8_t>(v));
     return image;
 }
 
