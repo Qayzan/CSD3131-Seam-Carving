@@ -25,9 +25,9 @@ The report write-up is spread across all items: every owner writes the report te
 
 | # | Initials | Member | SIT ID | GitHub | Items | Load |
 |---|---|---|---|---|---|---|
-| 1 | FF | Muhammad Fauzan bin Mohamed Fauzy | 2403386 | `Qayzan` | All of Question 1: shared foundation (1) + DP seam carving (2), and the Divide-and-Conquer Sobel discussion (7) | Heavy. The DP finder moved here on 15 Nov so Question 1 is one person's code |
-| 2 | YN | Nur Syazliyarni Binte Zazali (Yarni) | 2402942 | `nursyazliyarni` | Question 2 report: DP recurrence (6) + DP complexity (8, DP part) | Medium. Written work only since 15 Nov; the DP code is FF's |
-| 3 | HM | Lee Hwee Min | 2403441 | `lhweemin` | Greedy (3) + exponential-seams proof (5) + benchmark harness | Medium. Greedy is light, so the proof and timing tools fill the gap |
+| 1 | FF | Muhammad Fauzan bin Mohamed Fauzy | 2403386 | `Qayzan` | All of Question 1: shared foundation (1) + DP seam carving (2), implementation, tests and results | Heavy. The DP finder moved here on 15 Nov so Question 1 is one person's code |
+| 2 | YN | Nur Syazliyarni Binte Zazali (Yarni) | 2402942 | `nursyazliyarni` | All of Question 2: exponential-seams proof (5), DP recurrence (6), and Divide-and-Conquer Sobel discussion (7); plus DP complexity in Q5(b) | Medium. Question 2 written work; the C++ DP implementation is FF's |
+| 3 | HM | Lee Hwee Min | 2403441 | `lhweemin` | Greedy (3) + benchmark harness | Medium. Greedy implementation, tests and timing tools |
 | 4 | WN | Siti Syazwani Binte Jusri (Wani) | 2402594 | `waneyyj` | Graph Cut part 1: graph construction + max-flow (4) | Heavy |
 | 5 | KO | Kervin Ong Guan Cheng | 2403337 | `kervino` | Graph Cut part 2: seam extraction + check against DP (4) + Graph Cut complexity (8, Graph Cut part) | Heavy |
 | 6 | RB | Rifqah Batrisya Binte Nazarudi | 2401601 | `riffyyyy` | Comparison of the three methods (9) + improvements (10) + report assembly (links, team IDs, AI Usage Declaration, formatting) | Medium. Heavy near the deadline, since it depends on everyone else finishing |
@@ -36,9 +36,9 @@ The report write-up is spread across all items: every owner writes the report te
 
 | Owner | Files | Branch |
 |---|---|---|
-| FF | `src/seam_carving/image_utils.cpp`, `energy.cpp`, `interfaces.hpp`, `seam_ops.cpp`, `carver.cpp`, `dynamic_programming.cpp` (+ their headers), `src/main.cpp` (demo app), their tests; report notes for item 7 | `feature/ff-foundation` |
-| YN | report notes for items 6 and 8 (DP), in `docs/theory/` and `docs/analysis/` | `docs/yn-theory` |
-| HM | `src/seam_carving/greedy.cpp` (+ header), `tests/test_greedy.cpp`, `benchmarks/`; report notes for item 5 | `feature/hm-greedy` |
+| FF | `src/seam_carving/image_utils.cpp`, `energy.cpp`, `interfaces.hpp`, `seam_ops.cpp`, `carver.cpp`, `dynamic_programming.cpp` (+ their headers), `src/main.cpp` (demo app), their tests; Question 1 report | `feature/ff-foundation` |
+| YN | all Question 2 sections (items 5, 6 and 7) in `docs/theory/`, plus DP analysis for Q5(b) in `docs/analysis/` | `docs/yn-theory` |
+| HM | `src/seam_carving/greedy.cpp` (+ header), `tests/test_greedy.cpp`, `benchmarks/`; Question 3 report | `feature/hm-greedy` |
 | WN | `src/seam_carving/seam_graph.*`, `src/seam_carving/max_flow.*`, `tests/test_graph_cut_part1.cpp` | `feature/wn-graph-cut` |
 | KO | `src/seam_carving/graph_cut.cpp` (+ header), `tests/test_graph_cut.cpp`; report notes for item 8 (Graph Cut) | `feature/ko-graph-cut` |
 | RB | `docs/analysis/`, `docs/report/` | `docs/rb-analysis-report` |
@@ -53,7 +53,7 @@ The report write-up is spread across all items: every owner writes the report te
 - **FF → KO:** the DP finder (`dp::findSeam`) is the reference KO checks the graph cut seam against.
 - **HM → everyone, RB:** the benchmark harness times all three finders the same way. RB uses its results for the comparison (item 9).
 - **YN, KO → RB:** the DP and Graph Cut complexity (item 8) feed the comparison and improvements (items 9, 10).
-- **HM, YN, FF:** items 5, 6 and 7 together form the Question 2 answers. Use the same notation as [algorithm_design.md](algorithm_design.md) §2.3.
+- **YN owns all of Question 2:** items 5, 6 and 7. FF supplies Sobel implementation details and measurements for YN to cite or adapt; HM can share existing seam-count proof notes. Use the same notation as [algorithm_design.md](algorithm_design.md) §2.3.
 
 ## Internal timeline (proposal — adjust at the next meeting)
 
