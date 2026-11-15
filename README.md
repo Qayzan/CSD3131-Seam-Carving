@@ -81,6 +81,8 @@ ctest --test-dir build -C Release --output-on-failure
 
 In Visual Studio you can also use **File → Open → Folder** on the repository. It reads `CMakeLists.txt` and builds the same targets.
 
+**Want a solution file?** Double-click `open_in_visual_studio.bat` in the repository folder. It generates `build\vs\SeamCarving.slnx` (or `.sln` on older Visual Studio) with your installed Visual Studio and opens it. Press F5 to run the demo on the sample picture; the results land in `examples/output/vs/`. Run the script again after pulling new `.cpp` files. The solution isn't committed because CMake writes absolute paths from your own computer into it.
+
 New `.cpp` files in `src/seam_carving/` and new `tests/test_*.cpp` files are picked up automatically by the next build. Each test file is its own program with its own `main()`, and returns 0 when all its checks pass.
 
 ## Project structure
