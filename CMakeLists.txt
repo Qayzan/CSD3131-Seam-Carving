@@ -36,6 +36,12 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/src/main.cpp)
     add_executable(seam_carver ${CMAKE_SOURCE_DIR}/src/main.cpp)
     target_link_libraries(seam_carver PRIVATE seam_carving)
     target_compile_options(seam_carver PRIVATE ${SEAM_WARNINGS})
+    # Visual Studio solution (open_in_visual_studio.bat): F5 runs the demo on the
+    # sample picture from the repository folder, instead of the "ALL_BUILD" project.
+    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT seam_carver)
+    set_target_properties(seam_carver PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        VS_DEBUGGER_COMMAND_ARGUMENTS "assets/images/synthetic_scene.png examples/output/vs/carved.png --width 336 --seams examples/output/vs/seams.png")
 endif()
 
 # ---- Tests: one program per tests/test_*.cpp --------------------------------

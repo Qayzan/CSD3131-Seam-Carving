@@ -25,8 +25,8 @@ The report write-up is spread across all items: every owner writes the report te
 
 | # | Initials | Member | SIT ID | GitHub | Items | Load |
 |---|---|---|---|---|---|---|
-| 1 | FF | Muhammad Fauzan bin Mohamed Fauzy | 2403386 | `Qayzan` | Shared foundation (1) + Divide-and-Conquer Sobel discussion (7) | Medium. Item 7 sits naturally with the energy-map code |
-| 2 | YN | Nur Syazliyarni Binte Zazali (Yarni) | 2402942 | `nursyazliyarni` | DP seam carving (2) + DP recurrence (6) + DP complexity (8, DP part) | Medium. The code, the recurrence and the complexity are all the same idea |
+| 1 | FF | Muhammad Fauzan bin Mohamed Fauzy | 2403386 | `Qayzan` | All of Question 1: shared foundation (1) + DP seam carving (2), and the Divide-and-Conquer Sobel discussion (7) | Heavy. The DP finder moved here on 15 Nov so Question 1 is one person's code |
+| 2 | YN | Nur Syazliyarni Binte Zazali (Yarni) | 2402942 | `nursyazliyarni` | Question 2 report: DP recurrence (6) + DP complexity (8, DP part) | Medium. Written work only since 15 Nov; the DP code is FF's |
 | 3 | HM | Lee Hwee Min | 2403441 | `lhweemin` | Greedy (3) + exponential-seams proof (5) + benchmark harness | Medium. Greedy is light, so the proof and timing tools fill the gap |
 | 4 | WN | Siti Syazwani Binte Jusri (Wani) | 2402594 | `waneyyj` | Graph Cut part 1: graph construction + max-flow (4) | Heavy |
 | 5 | KO | Kervin Ong Guan Cheng | 2403337 | `kervino` | Graph Cut part 2: seam extraction + check against DP (4) + Graph Cut complexity (8, Graph Cut part) | Heavy |
@@ -36,21 +36,21 @@ The report write-up is spread across all items: every owner writes the report te
 
 | Owner | Files | Branch |
 |---|---|---|
-| FF | `src/seam_carving/image_utils.cpp`, `energy.cpp`, `interfaces.hpp`, `seam_ops.cpp`, `carver.cpp` (+ their headers), `src/main.cpp` (demo app); report notes for item 7 | `feature/ff-foundation` |
-| YN | `src/seam_carving/dynamic_programming.cpp` (+ header), `tests/test_dynamic_programming.cpp`; report notes for items 6 and 8 (DP) | `feature/yn-dynamic-programming` |
+| FF | `src/seam_carving/image_utils.cpp`, `energy.cpp`, `interfaces.hpp`, `seam_ops.cpp`, `carver.cpp`, `dynamic_programming.cpp` (+ their headers), `src/main.cpp` (demo app), their tests; report notes for item 7 | `feature/ff-foundation` |
+| YN | report notes for items 6 and 8 (DP), in `docs/theory/` and `docs/analysis/` | `docs/yn-theory` |
 | HM | `src/seam_carving/greedy.cpp` (+ header), `tests/test_greedy.cpp`, `benchmarks/`; report notes for item 5 | `feature/hm-greedy` |
 | WN | `src/seam_carving/seam_graph.*`, `src/seam_carving/max_flow.*`, `tests/test_graph_cut_part1.cpp` | `feature/wn-graph-cut` |
 | KO | `src/seam_carving/graph_cut.cpp` (+ header), `tests/test_graph_cut.cpp`; report notes for item 8 (Graph Cut) | `feature/ko-graph-cut` |
 | RB | `docs/analysis/`, `docs/report/` | `docs/rb-analysis-report` |
 
-> **Branches from the first set-up.** `origin/feature/ff-dynamic-programming` holds a Python DP written before this split. DP is now YN's item, and the project is C++. The old branches (`docs/yn-theory`, `docs/ko-analysis`, `docs/rb-coordination`) belong to the old split. Each owner creates the branch from the table above and can delete their old one.
+> **Branches from the first set-up.** `origin/feature/ff-dynamic-programming` holds a Python DP written before this split. The project is now C++, and the C++ DP is FF's (`dynamic_programming.cpp`). The old branches (`docs/yn-theory`, `docs/ko-analysis`, `docs/rb-coordination`) belong to the old split. Each owner creates the branch from the table above and can delete their old one.
 
 ## Interfaces between people
 
 - **FF → everyone:** image I/O, the energy map, the shared types (`interfaces.hpp`: `EnergyMap`, `Seam`, `Orientation`, `SeamFinder`), seam removal and the carving loop. The contract is in [interfaces.md](interfaces.md). Teammates *call* these. They don't re-implement them.
-- **YN, HM, KO → FF:** a `findSeam(energy, orientation)` for DP, greedy and graph cut that follows the contract, so the carver, benchmarks and demo can run all three.
+- **HM, KO → FF:** a `findSeam(energy, orientation)` for DP, greedy and graph cut that follows the contract, so the carver, benchmarks and demo can run all three.
 - **WN → KO (Graph Cut):** `buildVerticalSeamGraph(energy)` builds the flow network, and `FlowNetwork::maxFlow(source, sink)` leaves the residual capacities in `edges()`. KO reads the source side S from them (BFS from the source through edges with capacity > 0) and turns it into the seam. The details are at the top of `src/seam_carving/seam_graph.hpp`.
-- **YN → KO:** the DP finder is the reference KO checks the graph cut seam against.
+- **FF → KO:** the DP finder (`dp::findSeam`) is the reference KO checks the graph cut seam against.
 - **HM → everyone, RB:** the benchmark harness times all three finders the same way. RB uses its results for the comparison (item 9).
 - **YN, KO → RB:** the DP and Graph Cut complexity (item 8) feed the comparison and improvements (items 9, 10).
 - **HM, YN, FF:** items 5, 6 and 7 together form the Question 2 answers. Use the same notation as [algorithm_design.md](algorithm_design.md) §2.3.
