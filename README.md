@@ -14,9 +14,9 @@ The assignment compares three ways to find the minimum-energy seam (DP, Greedy, 
 
 | # | Member | GitHub | Items | Your branch | Where your work goes |
 |---|---|---|---|---|---|
-| 1 | FF — Muhammad Fauzan | `Qayzan` | All of Question 1: shared foundation — energy map (Sobel), seam removal, resize loop (1) — and DP seam carving, vertical + horizontal (2) + Divide-and-Conquer Sobel discussion (7) | `feature/ff-foundation` | `image_utils`, `energy`, `interfaces`, `seam_ops`, `carver`, `dynamic_programming`, `src/main.cpp` |
-| 2 | YN — Yarni | `nursyazliyarni` | Question 2 report: DP recurrence (6) + DP complexity (8, DP part) | `docs/yn-theory` | `docs/theory/`, `docs/analysis/` |
-| 3 | HM — Hwee Min | `lhweemin` | Greedy (3) + exponential-seams proof (5) + benchmark harness | `feature/hm-greedy` | `greedy`, `tests/test_greedy.cpp`, `benchmarks/` |
+| 1 | FF — Muhammad Fauzan | `Qayzan` | All of Question 1: shared foundation — energy map (Sobel), seam removal, resize loop (1) — and DP seam carving, vertical + horizontal (2) | `feature/ff-foundation` | `image_utils`, `energy`, `interfaces`, `seam_ops`, `carver`, `dynamic_programming`, `src/main.cpp` |
+| 2 | YN — Yarni | `nursyazliyarni` | All of Question 2: seam-count proof (5), DP recurrence (6), Divide-and-Conquer Sobel discussion (7); plus DP complexity in Q5(b) | `docs/yn-theory` | `docs/theory/`, `docs/analysis/` |
+| 3 | HM — Hwee Min | `lhweemin` | Greedy (3) + benchmark harness | `feature/hm-greedy` | `greedy`, `tests/test_greedy.cpp`, `benchmarks/` |
 | 4 | WN — Wani | `waneyyj` | Graph Cut part 1: graph construction + max-flow (4) | `feature/wn-graph-cut` | `seam_graph`, `max_flow`, `tests/test_graph_cut_part1.cpp` |
 | 5 | KO — Kervin | `kervino` | Graph Cut part 2: seam extraction + check against DP (4) + Graph Cut complexity (8, Graph Cut part) | `feature/ko-graph-cut` | `graph_cut`, `tests/test_graph_cut.cpp` |
 | 6 | RB — Rifqah | `riffyyyy` | Comparison of the three methods (9) + improvements (10) + report assembly (links, team IDs, AI Usage Declaration, formatting) | `docs/rb-analysis-report` | `docs/analysis/`, `docs/report/` |
@@ -57,7 +57,7 @@ All source files are in `src/seam_carving/` (`.cpp`, plus a `.hpp` header when o
 
 - **DP, Greedy and Graph Cut plug into the shared code.** Each seam finder takes an energy map and returns a seam in the agreed format. Then the shared carving loop, demo and benchmarks work with it unchanged. The format is in [docs/interfaces.md](docs/interfaces.md).
 - **Graph Cut is two people.** WN builds the flow network and runs max-flow, and KO turns the result into a seam. The hand-over is described at the top of `src/seam_carving/seam_graph.hpp`.
-- **Question 2 is three people.** Items 5 (HM), 6 (YN) and 7 (FF) share the notation in [docs/algorithm_design.md](docs/algorithm_design.md) §2.3.
+- **Question 2 belongs to Yarni.** She owns items 5, 6 and 7 (all of Q2); FF provides Sobel code and benchmarks as supporting material, while HM's earlier seam-count notes may be reused.
 - **The comparison uses everyone's results.** HM's benchmark harness times all three finders the same way, and RB writes the comparison and improvements from those numbers.
 
 More detail (rules, commit messages, code style) is in [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/git_workflow.md](docs/git_workflow.md).
