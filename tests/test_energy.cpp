@@ -2,7 +2,9 @@
 // test_energy.cpp  --  Sobel energy map (item 1, FF) and its D&C / separable
 // variants (item 7, FF)
 // ============================================================================
+#include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <random>
 #include <stdexcept>
 #include <vector>
@@ -150,11 +152,18 @@ void testColourUsesLuminance() {
 
 void testTransposeSymmetry() {
     // Gx of the picture = Gy of the transposed picture, so the energy of the transpose is the
-    // transpose of the energy (exactly: same additions in the same order).
+    // transpose of the energy. The two kernels add their terms in a different order, so the
+    // results can differ in the last bit on some compilers: compare with a tiny tolerance.
     std::mt19937 rng(9);
     for (const auto& shape : kShapes) {
         const Image image = randomImage(rng, shape[0], shape[1], 3);
-        CHECK(sobelEnergy(transpose(image)).values == transpose(sobelEnergy(image)).values);
+        const EnergyMap a = sobelEnergy(transpose(image));
+        const EnergyMap b = transpose(sobelEnergy(image));
+        CHECK(a.rows == b.rows && a.cols == b.cols && a.values.size() == b.values.size());
+        double worst = 0.0;
+        for (std::size_t i = 0; i < a.values.size() && i < b.values.size(); ++i)
+            worst = std::max(worst, std::fabs(a.values[i] - b.values[i]));
+        CHECK(worst <= 1e-9);
     }
 }
 
