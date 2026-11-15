@@ -111,12 +111,17 @@ Image loadImage(const std::string& path) {
     return image;
 }
 
-void saveImage(const std::string& path, const Image& image) {
-    checkImage(image, "saveImage");
+void checkOutputFormat(const std::string& path) {
     const std::string ext = lowerExtension(path);
     if (ext != ".png" && ext != ".bmp" && ext != ".tga" && ext != ".jpg" && ext != ".jpeg")
-        throw std::invalid_argument("saveImage: unsupported file type '" + ext +
+        throw std::invalid_argument("unsupported output file type '" + ext + "' for '" + path +
                                     "' (use .png, .bmp, .tga, .jpg or .jpeg)");
+}
+
+void saveImage(const std::string& path, const Image& image) {
+    checkImage(image, "saveImage");
+    checkOutputFormat(path);
+    const std::string ext = lowerExtension(path);
 
     const std::filesystem::path parent = utf8Path(path).parent_path();
     if (!parent.empty()) {

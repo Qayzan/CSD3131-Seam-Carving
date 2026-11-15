@@ -30,6 +30,11 @@ Image makeImage(int rows, int cols, int channels, std::uint8_t value = 0);
 // Throws std::runtime_error (missing, unreadable, corrupt or unsupported file).
 Image loadImage(const std::string& path);
 
+// Throws std::invalid_argument unless `path` ends in .png, .bmp, .tga, .jpg or
+// .jpeg (any case). saveImage calls it first; programs can call it early, before
+// doing slow work whose result could not be saved.
+void checkOutputFormat(const std::string& path);
+
 // Writes by file extension: .png, .bmp, .tga, .jpg / .jpeg (quality 95).
 // Creates missing parent folders.
 // Throws std::invalid_argument for a bad image or an unknown extension,

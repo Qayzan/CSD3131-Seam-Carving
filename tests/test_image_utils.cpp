@@ -144,6 +144,9 @@ void testUnsupportedSaveFormats() {
     CHECK_THROWS(std::invalid_argument, saveImage(file("no_extension"), image));
     CHECK_THROWS(std::invalid_argument, saveImage(file("picture.gif"), image));
     CHECK_THROWS(std::invalid_argument, saveImage(file("picture.webp"), image));
+    CHECK_THROWS(std::invalid_argument, checkOutputFormat("result.gif"));
+    checkOutputFormat("RESULT.JPEG");  // accepted, any case (no throw)
+    checkOutputFormat("folder/out.png");
 }
 
 void testGrayscale() {

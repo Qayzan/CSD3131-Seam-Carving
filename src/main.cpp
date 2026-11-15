@@ -54,6 +54,7 @@
 namespace {
 
 struct Algorithm {
+    std::string name;
     SeamFinder finder;
     std::string description;
 };
@@ -76,21 +77,29 @@ Seam graphCutViaExtraction(const EnergyMap& energy, Orientation orientation) {
 }
 #endif
 
-std::map<std::string, Algorithm> availableAlgorithms() {
-    std::map<std::string, Algorithm> algorithms;
+// In order of preference: the first one is the default (fastest optimal method first).
+std::vector<Algorithm> availableAlgorithms() {
+    std::vector<Algorithm> algorithms;
 #ifdef HAVE_DP
-    algorithms["dp"] = {dp::findSeam, "dynamic programming (YN), optimal seam, Theta(rows*cols) per seam"};
+    algorithms.push_back({"dp", dp::findSeam, "dynamic programming (YN), optimal seam, Theta(rows*cols) per seam"});
 #endif
 #ifdef HAVE_GREEDY
-    algorithms["greedy"] = {greedy::findSeam, "greedy (HM), cheapest neighbour row by row, not always optimal"};
+    algorithms.push_back({"greedy", greedy::findSeam, "greedy (HM), cheapest neighbour row by row, not always optimal"});
 #endif
 #ifdef HAVE_GRAPH_CUT
-    algorithms["graphcut"] = {graphcut::findSeam, "graph cut (WN + KO), min s-t cut via Edmonds-Karp; slow"};
+    algorithms.push_back({"graphcut", graphcut::findSeam,
+                          "graph cut (WN + KO), min s-t cut via Edmonds-Karp; very slow on large images"});
 #elif defined(HAVE_GRAPH_CUT_EXTRACTION)
-    algorithms["graphcut"] = {graphCutViaExtraction,
-                              "graph cut (WN + KO via seam_extraction), min s-t cut via Edmonds-Karp; slow"};
+    algorithms.push_back({"graphcut", graphCutViaExtraction,
+                          "graph cut (WN + KO via seam_extraction), min s-t cut via Edmonds-Karp; very slow on large images"});
 #endif
     return algorithms;
+}
+
+const Algorithm* findAlgorithm(const std::vector<Algorithm>& algorithms, const std::string& name) {
+    for (const Algorithm& a : algorithms)
+        if (a.name == name) return &a;
+    return nullptr;
 }
 
 void printUsage() {
@@ -145,8 +154,8 @@ int listAlgorithms() {
                      "They arrive when merged: DP (YN), greedy (HM), graph cut (KO + WN).\n";
         return 0;
     }
-    for (const auto& [name, algorithm] : algorithms)
-        std::cout << "  " << std::left << std::setw(10) << name << algorithm.description << "\n";
+    for (const Algorithm& algorithm : algorithms)
+        std::cout << "  " << std::left << std::setw(10) << algorithm.name << algorithm.description << "\n";
     return 0;
 }
 
@@ -221,12 +230,17 @@ int main(int argc, char** argv) {
                          "Try --bench-sobel, or --list after merging.\n";
             return 2;
         }
-        std::string name = options.count("--algorithm") ? options["--algorithm"] : algorithms.begin()->first;
-        if (!algorithms.count(name)) {
+        const std::string name = options.count("--algorithm") ? options["--algorithm"] : algorithms.front().name;
+        const Algorithm* algorithm = findAlgorithm(algorithms, name);
+        if (!algorithm) {
             std::cerr << "Algorithm '" << name << "' is not in this build. Available:\n";
             listAlgorithms();
             return 2;
         }
+        // Check every output name before the (possibly slow) carving starts.
+        checkOutputFormat(positional[1]);
+        if (options.count("--energy")) checkOutputFormat(options["--energy"]);
+        if (options.count("--seams")) checkOutputFormat(options["--seams"]);
 
         CarveOrder order = CarveOrder::WidthFirst;
         if (options.count("--order")) {
@@ -243,11 +257,15 @@ int main(int argc, char** argv) {
         std::cout << "input      " << positional[0] << "  (" << input.rows << " x " << input.cols << ", "
                   << (input.channels == 3 ? "RGB" : "grey") << ")\n"
                   << "target     " << targetRows << " x " << targetCols << "\n"
-                  << "algorithm  " << name << " - " << algorithms.at(name).description << "\n";
+                  << "algorithm  " << name << " - " << algorithm->description << "\n";
+        if (name == "graphcut" && static_cast<long long>(input.rows) * input.cols > 20000 &&
+            (input.rows - targetRows) + (input.cols - targetCols) > 0)
+            std::cout << "note       graph cut needs a max-flow per seam (about 1.4 s per seam measured at\n"
+                         "           121 x 178); try a small image or a few seams first\n";
         if (options.count("--energy")) saveImage(options["--energy"], energyPicture(sobelEnergy(input)));
 
         const bool keepFrames = options.count("--frames") > 0;
-        const CarveResult result = carve(input, targetRows, targetCols, algorithms.at(name).finder, order, keepFrames);
+        const CarveResult result = carve(input, targetRows, targetCols, algorithm->finder, order, keepFrames);
         saveImage(positional[1], result.image);
 
         if (options.count("--seams")) {
