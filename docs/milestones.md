@@ -40,3 +40,5 @@ Each milestone ends with: files changed, features, tests actually run, known iss
 - Image library still to be decided by FF (proposal: stb_image, no install).
 
 **Next:** shared foundation in C++ (FF), then DP (YN), Greedy (HM) and Graph Cut part 2 (KO).
+
+**Update 15 Nov:** all of Question 1 is now FF's, including the DP code (item 2). YN writes the Question 2 report parts (items 6 and 8, DP). The foundation and the DP finder are in pull request #2.

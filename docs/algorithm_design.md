@@ -1,6 +1,6 @@
 # Architecture and algorithm design
 
-Status: **design proposal**. Sections marked *decision* are proposals the team can still change before code depends on them. Owners: architecture and §2.1/§2.6–2.8 shared foundation (FF, item 1); §2.2–2.5 and §2.9–2.10 DP (YN, items 2, 6, 8); §3 Graph Cut (WN part 1, KO part 2, item 4). §2.11 is input for RB's improvements (item 10).
+Status: **design proposal**. Sections marked *decision* are proposals the team can still change before code depends on them. Owners: architecture and §2.1/§2.6–2.8 shared foundation (FF, item 1); §2.2–2.5 DP code (FF, item 2); recurrence and §2.9–2.10 write-up (YN, items 6, 8); §3 Graph Cut (WN part 1, KO part 2, item 4). §2.11 is input for RB's improvements (item 10).
 
 ---
 
@@ -26,7 +26,7 @@ The demo app (`src/main.cpp`) is a command-line program: input image, target siz
                          ▼
      ┌────────── carve(image, target, finder) ─────────────────┐
      │  loop until target size:                                │
-     │    E    = sobelEnergy(image)              (EnergyMap)   │  ◄── dp::findSeam        (YN)
+     │    E    = sobelEnergy(image)              (EnergyMap)   │  ◄── dp::findSeam        (FF)
      │    seam = finder(E, orientation)          (Seam)        │  ◄── greedy::findSeam    (HM)
      │    validateSeam(seam, E.rows, E.cols)                   │  ◄── graphcut::findSeam  (KO, on
      │    image = removeSeam(image, seam)                      │        WN's graph + max-flow)

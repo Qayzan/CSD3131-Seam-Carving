@@ -5,7 +5,7 @@
 ## Item / area
 
 - [ ] 1 Shared foundation: energy map, seam removal, resize loop, transpose (FF)
-- [ ] 2 DP seam carving (YN)
+- [ ] 2 DP seam carving (FF)
 - [ ] 3 Greedy seam carving (HM)
 - [ ] 4 Graph Cut part 1: graph construction + max-flow (WN)
 - [ ] 4 Graph Cut part 2: seam extraction + check against DP (KO)

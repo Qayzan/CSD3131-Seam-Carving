@@ -5,8 +5,8 @@
 | Branch | Purpose |
 |---|---|
 | `main` | Stable integration branch. Always passes CI. Changes arrive only through pull requests. |
-| `feature/ff-foundation` | Shared foundation (1) + D&C Sobel discussion (7) — FF |
-| `feature/yn-dynamic-programming` | DP (2) + recurrence (6) + DP complexity (8) — YN |
+| `feature/ff-foundation` | Shared foundation (1) + DP seam carving (2) + D&C Sobel discussion (7) — FF |
+| `docs/yn-theory` | Report: DP recurrence (6) + DP complexity (8) — YN |
 | `feature/hm-greedy` | Greedy (3) + exponential proof (5) + benchmark harness — HM |
 | `feature/wn-graph-cut` | Graph Cut part 1: graph construction + max-flow (4) — WN |
 | `feature/ko-graph-cut` | Graph Cut part 2: seam extraction + DP check (4) + Graph Cut complexity (8) — KO |
