@@ -169,31 +169,91 @@ However, these measurements only represent performance on small synthetic energy
 
 The median values for each stage were calculated independently, so their sum may not exactly equal the median total runtime.
 
+
 ## 5. Comparison with Dynamic Programming (Question 5c)
 
-*Pending integration with the team's Dynamic Programming implementation.*
+We compared Graph Cut against the team's actual Dynamic Programming
+implementation using identical synthetic energy maps.
 
-The final comparison will use the same energy maps and input images for both algorithms.
+Eight correctness tests were performed, consisting of five vertical
+and three horizontal seam cases. Horizontal seams were tested by
+transposing the energy map before running Graph Cut.
 
-We will compare:
+Both algorithms produced the same minimum seam cost in all eight tests.
 
-- **Seam positions:** Whether both algorithms identify the same seam or different seams with equal minimum energy.
-- **Seam cost:** Whether Graph Cut and DP produce the same minimum total energy.
-- **Running time:** The execution time of both algorithms under the same conditions.
-- **Visual quality:** The appearance of the images after resizing using each algorithm.
+### 5.1 Runtime Comparison
 
-The results will be added once the team's DP implementation is ready.
+Both algorithms were benchmarked using synthetic square energy maps.
+Each test was repeated five times, and the median runtime was recorded.
+
+| Image Size | DP (Median) | Graph Cut (Median) |
+|---|---:|---:|
+| 10×10 | < 0.001 ms | 0.052 ms |
+| 20×20 | 0.002 ms | 0.734 ms |
+| 30×30 | 0.006 ms | 2.640 ms |
+| 40×40 | 0.011 ms | 10.763 ms |
+
+Dynamic Programming was consistently faster than Graph Cut.
+
+At 40×40, DP took approximately 0.011 ms, while Graph Cut took
+10.763 ms.
+
+This is expected because DP processes each pixel once, giving
+O(mn) time complexity, while Graph Cut performs graph construction
+and maximum-flow calculations.
+
+The results are consistent with Edmonds-Karp's worst-case
+time complexity of O((mn)^3).
+
+These benchmarks measure vertical seam finding using synthetic
+energy maps rather than complete image resizing.
+
+
 
 ## 6. Final Integration and Evaluation
 
-*Pending integration with the team's image-processing and resizing implementation.*
+We tested Graph Cut and Dynamic Programming using the team's
+shared seam-carving implementation.
 
-The final tests will include:
+The original synthetic scene was scaled to 80×50 pixels for testing.
+Both algorithms then resized the image to 75×47 pixels by removing
+five vertical seams and three horizontal seams.
 
-- Vertical seam carving using real image energy maps.
-- Horizontal seam carving using the transposed energy map.
-- Repeated seam removal to resize images.
-- Comparison of Graph Cut results against DP.
-- Final runtime and visual quality evaluation.
+The same Sobel energy calculation, seam-removal logic and resizing
+order were used for both algorithms.
 
-These tests will verify that Graph Cut works correctly as part of the complete seam-carving application.
+### 6.1 Real-Image Test Results
+
+| Measurement | Dynamic Programming | Graph Cut |
+|---|---:|---:|
+| Input dimensions | 80×50 | 80×50 |
+| Output dimensions | 75×47 | 75×47 |
+| Seam-finding time | 0.095 ms | 41.666 ms |
+| Total resizing time | 0.275 ms | 41.851 ms |
+
+Both algorithms successfully produced images with the requested
+dimensions.
+
+The output images were also compared pixel by pixel. There were
+zero differing pixel-channel values, meaning both algorithms
+produced identical resized images for this test.
+
+### 6.2 Discussion
+
+Although both algorithms produced the same visual result, Graph Cut
+was considerably slower.
+
+DP completed the resizing in 0.275 ms, while Graph Cut took
+41.851 ms overall.
+
+Most of Graph Cut's execution time was spent finding seams,
+rather than calculating energy maps or removing pixels.
+
+The results suggest that Dynamic Programming is more efficient
+for this seam-carving task, while Graph Cut provides an alternative
+minimum-cut formulation.
+
+These results are based on one downscaled synthetic scene and
+one resizing configuration. Additional images and repeated
+measurements would provide a broader evaluation.
+
