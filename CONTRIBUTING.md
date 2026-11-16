@@ -31,8 +31,8 @@ Then open a **pull request into `main`** on GitHub and fill in the template.
 
 | # | Owner | Items | Branch |
 |---|---|---|---|
-| 1 | FF | Shared foundation (1), D&C Sobel (7) | `feature/ff-foundation` |
-| 2 | YN | DP (2), recurrence (6), DP complexity (8) | `feature/yn-dynamic-programming` |
+| 1 | FF | Shared foundation (1), DP (2), D&C Sobel (7) | `feature/ff-foundation` |
+| 2 | YN | Report: recurrence (6), DP complexity (8) | `docs/yn-theory` |
 | 3 | HM | Greedy (3), exponential proof (5), benchmarks | `feature/hm-greedy` |
 | 4 | WN | Graph Cut part 1: graph + max-flow (4) | `feature/wn-graph-cut` |
 | 5 | KO | Graph Cut part 2: extraction + DP check (4), Graph Cut complexity (8) | `feature/ko-graph-cut` |

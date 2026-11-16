@@ -9,7 +9,7 @@
 # /src/seam_carving/carver.*               @Qayzan
 # /src/main.cpp                            @Qayzan
 # /CMakeLists.txt                          @Qayzan
-# /src/seam_carving/dynamic_programming.*  @nursyazliyarni
+# /src/seam_carving/dynamic_programming.*  @Qayzan
 # /src/seam_carving/greedy.*               @lhweemin
 # /benchmarks/                             @lhweemin
 # /src/seam_carving/seam_graph.*           @waneyyj
