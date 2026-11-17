@@ -85,6 +85,10 @@ In Visual Studio you can also use **File → Open → Folder** on the repository
 
 New `.cpp` files in `src/seam_carving/` and new `tests/test_*.cpp` files are picked up automatically by the next build. Each test file is its own program with its own `main()`, and returns 0 when all its checks pass.
 
+## Interactive web demo
+
+`web/` is a browser app that runs this C++ code compiled to WebAssembly: pick a picture, drag the target size, choose DP / greedy / graph cut and watch every seam being found and removed, or compare the algorithms side by side. See [web/README.md](web/README.md) to build it, run it locally and put it online (CI builds it on every run).
+
 ## Project structure
 
 ```
@@ -106,6 +110,7 @@ CSD3131-Seam-Carving/
 ├── tests/                     # one test program per file: test_*.cpp
 ├── examples/                  # demonstrations and sample outputs
 ├── benchmarks/                # timing / comparison harness                 (HM)
+├── web/                       # interactive browser demo (WebAssembly)     (FF)
 ├── assets/images/             # small test images with their source/licence
 ├── docs/
 │   ├── requirements.md        # the brief and rubric, turned into a checklist
