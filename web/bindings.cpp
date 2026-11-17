@@ -5,7 +5,8 @@
 //
 // Nothing here re-implements an algorithm. The browser calls the SAME C++ code
 // as the command-line demo and the tests: sobelEnergy, dp::findSeam,
-// greedy::findSeam, graph cut (when merged), validateSeam, removeSeam and carve().
+// validateSeam, removeSeam and carve(). Greedy and graph cut are added by
+// their owners (see "Teammates" below).
 //
 // A Carver object holds one picture. The page drives it one seam at a time:
 //     findSeam(orientation, algorithm)   energy of the current picture + seam
@@ -35,21 +36,16 @@
 #include "interfaces.hpp"
 #include "seam_ops.hpp"
 
-#if __has_include("dynamic_programming.hpp")
-#include "dynamic_programming.hpp"
-#define HAVE_DP 1
-#endif
-#if __has_include("greedy.hpp")
-#include "greedy.hpp"
-#define HAVE_GREEDY 1
-#endif
-#if __has_include("graph_cut.hpp")
-#include "graph_cut.hpp"
-#define HAVE_GRAPH_CUT 1
-#elif __has_include("seam_extraction.hpp")
-#include "seam_extraction.hpp"
-#define HAVE_GRAPH_CUT_EXTRACTION 1
-#endif
+#include "dynamic_programming.hpp"  // FF: Question 1, wired in
+
+// ---- Teammates: add your own seam finder here --------------------------------
+// The demo is the shared base plus the DP. Each method's owner plugs in their
+// own finder, so the work stays theirs:
+//   1. include your header below (e.g. "greedy.hpp" or "graph_cut.hpp");
+//   2. add one line to algorithmList() further down;
+//   3. rebuild (see web/README.md). The page lists, animates and compares
+//      every method in that list automatically.
+// ------------------------------------------------------------------------------
 
 using emscripten::val;
 
@@ -61,21 +57,6 @@ double msSince(Clock::time_point start) {
     return std::chrono::duration<double, std::milli>(Clock::now() - start).count();
 }
 
-#ifdef HAVE_GRAPH_CUT_EXTRACTION
-// Same temporary bridge as src/main.cpp, until graphcut::findSeam exists.
-Seam graphCutViaExtraction(const EnergyMap& energy, Orientation orientation) {
-    const EnergyMap map = (orientation == Orientation::Vertical) ? energy : transpose(energy);
-    graphcut::Grid grid(static_cast<std::size_t>(map.rows), std::vector<double>(static_cast<std::size_t>(map.cols)));
-    for (int r = 0; r < map.rows; ++r)
-        for (int c = 0; c < map.cols; ++c) grid[r][c] = map.at(r, c);
-    Seam seam;
-    seam.orientation = orientation;
-    seam.indices = graphcut::findVerticalGraphCutSeam(grid);
-    seam.energy = seamEnergy(energy, seam);
-    return seam;
-}
-#endif
-
 struct Algorithm {
     std::string id, label, note;
     SeamFinder finder;
@@ -84,17 +65,9 @@ struct Algorithm {
 const std::vector<Algorithm>& algorithmList() {
     static const std::vector<Algorithm> list = [] {
         std::vector<Algorithm> a;
-#ifdef HAVE_DP
-        a.push_back({"dp", "Dynamic programming", "Optimal seam, Θ(mn) per seam", dp::findSeam});
-#endif
-#ifdef HAVE_GREEDY
-        a.push_back({"greedy", "Greedy", "Cheapest neighbour row by row, not always optimal", greedy::findSeam});
-#endif
-#ifdef HAVE_GRAPH_CUT
-        a.push_back({"graphcut", "Graph cut", "Min-cut / max-flow, optimal but slow", graphcut::findSeam});
-#elif defined(HAVE_GRAPH_CUT_EXTRACTION)
-        a.push_back({"graphcut", "Graph cut", "Min-cut / max-flow, optimal but slow", graphCutViaExtraction});
-#endif
+        a.push_back({"dp", "Dynamic programming", "Optimal seam, \u0398(mn) per seam", dp::findSeam});
+        // HM:  a.push_back({"greedy", "Greedy", "Cheapest neighbour row by row", greedy::findSeam});
+        // KO:  a.push_back({"graphcut", "Graph cut", "Min-cut / max-flow, slow", graphcut::findSeam});
         return a;
     }();
     return list;

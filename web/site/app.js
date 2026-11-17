@@ -25,6 +25,8 @@ const ctx = view.getContext('2d');
 
 // ---------------------------------------------------------------- helpers
 const fmtMs = (ms) => (ms >= 1000 ? (ms / 1000).toFixed(2) + ' s' : ms >= 10 ? ms.toFixed(0) + ' ms' : ms.toFixed(2) + ' ms');
+// Same, as HTML with the unit set small and muted (for the readout)
+const unitHTML = (text) => text.replace(/ (ms|s|k|M)$/, '<small>$1</small>');
 const fmtNum = (x) => (x >= 1e6 ? (x / 1e6).toFixed(2) + ' M' : x >= 1e4 ? (x / 1e3).toFixed(1) + ' k' : x.toFixed(0));
 
 function setStatus(text, isError = false) {
@@ -34,10 +36,11 @@ function setStatus(text, isError = false) {
 
 function setRunning(on) {
     state.running = on;
-    $('play').textContent = on ? 'Pause' : 'Carve';
+    $('playLabel').textContent = on ? 'Pause' : 'Carve';
+    $('playIcon').setAttribute('href', on ? '#i-pause' : '#i-play');
     for (const id of ['step', 'reset', 'sample', 'file', 'workSize', 'compareBtn', 'order'])
         $(id).disabled = on;
-    for (const r of document.querySelectorAll('#algos input')) r.disabled = on;
+    for (const el of document.querySelectorAll('#algos input, .preset')) el.disabled = on;
 }
 
 function toImageData(rgba, width, height) {
@@ -54,7 +57,7 @@ async function loadBitmap(bitmap) {
         h = Math.max(1, Math.round(h * s));
     }
     if (w * h > 4_000_000) {
-        setStatus('That picture is very large; choose a smaller working size.', true);
+        setStatus('That picture is very large, choose a smaller working size', true);
         return;
     }
     const c = new OffscreenCanvas(w, h);
@@ -69,7 +72,7 @@ async function loadBitmap(bitmap) {
     $('targetW').value = Math.max(1, Math.round(w * 0.7));
     $('targetH').value = h;
     updateTargetLabels();
-    $('picInfo').textContent = `${bitmap.width} × ${bitmap.height} px, working at ${w} × ${h}.`;
+    $('picInfo').textContent = w === bitmap.width && h === bitmap.height ? `${w} × ${h} px` : `${bitmap.width} × ${bitmap.height} → ${w} × ${h} px`;
     resetPicture();
 }
 
@@ -82,7 +85,7 @@ function resetPicture() {
 }
 
 async function loadSample() {
-    setStatus('Loading picture…');
+    setStatus('Loading picture');
     try {
         const blob = await (await fetch($('sample').value)).blob();
         await loadBitmap(await createImageBitmap(blob));
@@ -92,7 +95,7 @@ async function loadSample() {
 }
 
 async function loadFile(file) {
-    if (!file || !file.type.startsWith('image/')) { setStatus('Please choose an image file.', true); return; }
+    if (!file || !file.type.startsWith('image/')) { setStatus('Choose an image file', true); return; }
     try {
         await loadBitmap(await createImageBitmap(file));
     } catch (e) {
@@ -122,10 +125,10 @@ function startRun(singleSeam = false) {
     }
     let plan = removalPlan(state.width - tw, state.height - th, Number($('order').value));
     if (singleSeam) plan = plan.slice(0, 1);
-    if (plan.length === 0) { setStatus('Already at the target size. Move a slider or press Reset.'); return; }
+    if (plan.length === 0) { setStatus('Already at the target size'); return; }
     if (state.algorithm === 'graphcut' && state.width * state.height > 40000)
-        setStatus('Graph cut is slow on big pictures (max-flow per seam). Try the Small working size.');
-    else setStatus(singleSeam ? 'Finding one seam…' : `Removing ${plan.length} seam${plan.length > 1 ? 's' : ''}…`);
+        setStatus('Graph cut solves a max-flow per seam, so it is slow on big pictures. Try the 480 px working size');
+    else setStatus(singleSeam ? 'Removing one seam' : `Removing ${plan.length} seam${plan.length > 1 ? 's' : ''}`);
     const speed = Number($('speed').value);
     state.planLength = plan.length;
     state.planStartSeams = state.seamsRemoved;
@@ -170,10 +173,10 @@ function drawBeforeAfter() {
 
 function setLegend() {
     const L = {
-        result: 'The red line is the next vertical seam (blue: horizontal) just before it is removed.',
-        energy: 'Energy of the current picture: bright = strong edges (kept), dark = flat areas (removed first).',
-        seams: '<i style="background:var(--seam-v)"></i>removed by vertical seams <i style="background:var(--seam-h)"></i>removed by horizontal seams, drawn on the original picture.',
-        compare: 'Original and result at the same scale.',
+        result: '<span class="li"><i style="background:var(--cut)"></i>Next vertical seam, just before it is cut</span><span class="li"><i style="background:var(--cut-h)"></i>Next horizontal seam</span>',
+        energy: 'Energy of the current picture. Bright pixels are edges and stay, dark pixels are flat and go first',
+        seams: '<span class="li"><i style="background:var(--cut)"></i>Removed by vertical seams</span><span class="li"><i style="background:var(--cut-h)"></i>Removed by horizontal seams</span>',
+        compare: 'Original and result at the same scale',
     };
     $('legend').innerHTML = L[state.view];
 }
@@ -198,14 +201,14 @@ function updateStats() {
     const r = state.run || { energyMs: 0, findMs: 0, removeMs: 0, count: 0 };
     const count = state.base.count + r.count;
     const find = state.base.findMs + r.findMs, energy = state.base.energyMs + r.energyMs, remove = state.base.removeMs + r.removeMs;
-    $('sSize').textContent = state.width ? `${state.width} × ${state.height}` : '–';
+    $('sSize').innerHTML = state.width ? `${state.width}<small class="x">×</small>${state.height}` : '–';
     $('sSeams').textContent = String(state.seamsRemoved);
-    $('sLast').textContent = state.run && state.run.lastEnergy != null ? fmtNum(state.run.lastEnergy) : $('sLast').textContent;
-    $('sFind').textContent = count ? fmtMs(find / count) : '–';
-    $('sEnergy').textContent = count ? fmtMs(energy / count) : '–';
-    $('sTotal').textContent = count ? fmtMs(find + energy + remove) : '–';
+    if (state.run && state.run.lastEnergy != null) $('sLast').innerHTML = unitHTML(fmtNum(state.run.lastEnergy));
+    $('sFind').innerHTML = count ? unitHTML(fmtMs(find / count)) : '–';
+    $('sEnergy').innerHTML = count ? unitHTML(fmtMs(energy / count)) : '–';
+    $('sTotal').innerHTML = count ? unitHTML(fmtMs(find + energy + remove)) : '–';
     const done = state.seamsRemoved - state.planStartSeams;
-    $('bar').style.width = state.planLength ? Math.min(100, 100 * done / state.planLength) + '%' : '0%';
+    $('bar').style.transform = `scaleX(${state.planLength ? Math.min(1, done / state.planLength) : 0})`;
 }
 
 // ---------------------------------------------------------------- worker messages
@@ -214,6 +217,8 @@ worker.onmessage = ({ data }) => {
     case 'ready':
         state.algorithms = data.algorithms;
         buildAlgorithmList();
+        if (state.algorithms.length < 2)
+            $('compareNote').textContent = 'Only dynamic programming is in this build so far. Greedy and graph cut appear here once their owners add them';
         loadSample();
         break;
     case 'frame': {
@@ -232,17 +237,17 @@ worker.onmessage = ({ data }) => {
             updateStats();
             refreshView();
             if (pendingRun) { const p = pendingRun; pendingRun = null; startRun(p.singleSeam); }
-            else setStatus('Ready. Pick a target size and press Carve.');
+            else setStatus('Ready');
         }
         break;
     }
     case 'done':
         finishRun();
-        setStatus(`Done: ${state.width} × ${state.height} after ${state.seamsRemoved} seams.`);
+        setStatus(`Done, ${state.width} × ${state.height} after ${state.seamsRemoved} seams`);
         break;
     case 'paused':
         finishRun();
-        setStatus('Paused. Press Carve to continue.');
+        setStatus('Paused');
         break;
     case 'view':
         if (data.kind === state.view) drawOnView(toImageData(data.rgba, data.width, data.height));
@@ -253,7 +258,7 @@ worker.onmessage = ({ data }) => {
     case 'compareDone':
         markBest();
         $('compareBtn').disabled = false;
-        setStatus('Comparison finished.');
+        setStatus('Comparison finished');
         break;
     case 'error':
         finishRun();
@@ -269,11 +274,11 @@ worker.onerror = (e) => setStatus('The seam carver failed to start: ' + (e.messa
 function buildAlgorithmList() {
     const box = $('algos');
     box.innerHTML = '';
-    if (state.algorithms.length === 0) { box.textContent = 'No algorithm compiled in.'; return; }
+    if (state.algorithms.length === 0) { box.textContent = 'No method compiled in'; return; }
     state.algorithm = state.algorithms[0].id;
     for (const a of state.algorithms) {
         const label = document.createElement('label');
-        label.className = 'algo';
+        label.className = 'method';
         label.innerHTML = `<input type="radio" name="algo" value="${a.id}"><strong></strong><small></small>`;
         label.querySelector('strong').textContent = a.label;
         label.querySelector('small').textContent = a.note;
@@ -285,7 +290,7 @@ function buildAlgorithmList() {
     markAlgo();
 }
 function markAlgo() {
-    for (const l of document.querySelectorAll('.algo'))
+    for (const l of document.querySelectorAll('.method'))
         l.classList.toggle('on', l.querySelector('input').checked);
 }
 
@@ -293,14 +298,14 @@ function markAlgo() {
 function runComparison() {
     if (!state.original) return;
     const tw = Number($('targetW').value), th = Number($('targetH').value);
-    if (tw === state.original.width && th === state.original.height) { setStatus('Set a target smaller than the picture first.'); return; }
+    if (tw === state.original.width && th === state.original.height) { setStatus('Set a target smaller than the picture first'); return; }
     const pixels = state.original.width * state.original.height;
     const algos = state.algorithms.map((a) => a.id).filter((id) => id !== 'graphcut' || pixels <= 40000);
     $('cards').innerHTML = '';
     for (const a of state.algorithms)
-        if (!algos.includes(a.id)) addCompareCard({ algorithm: a.id, error: 'Skipped: too slow at this picture size. Use the Small working size and a small picture.' });
+        if (!algos.includes(a.id)) addCompareCard({ algorithm: a.id, error: 'Skipped, too slow at this size. Use the 480 px working size and a small picture' });
     $('compareBtn').disabled = true;
-    setStatus('Comparing…');
+    setStatus('Comparing');
     const copy = new Uint8ClampedArray(state.original.data);
     worker.postMessage({ type: 'compare', rgba: copy, width: state.original.width, height: state.original.height,
                          targetWidth: tw, targetHeight: th, order: Number($('order').value), algorithms: algos }, [copy.buffer]);
@@ -309,13 +314,13 @@ function runComparison() {
 function addCompareCard(d) {
     const a = state.algorithms.find((x) => x.id === d.algorithm);
     const card = document.createElement('article');
-    card.className = 'card';
+    card.className = 'result';
     card.dataset.energy = d.error ? '' : String(d.totalSeamEnergy);
     const title = document.createElement('h3');
     title.textContent = a ? a.label : d.algorithm;
     if (d.error) {
         card.append(title);
-        const p = document.createElement('p'); p.className = 'hint'; p.textContent = d.error; card.append(p);
+        const p = document.createElement('p'); p.className = 'skip'; p.textContent = d.error; card.append(p);
     } else {
         const c = document.createElement('canvas');
         c.width = d.width; c.height = d.height;
@@ -323,23 +328,22 @@ function addCompareCard(d) {
         const dl = document.createElement('dl');
         dl.innerHTML = `<dt>Total seam energy</dt><dd class="e"></dd><dt>Finding seams</dt><dd></dd><dt>Energy maps</dt><dd></dd><dt>Whole resize</dt><dd></dd>`;
         const dd = dl.querySelectorAll('dd');
-        dd[0].textContent = fmtNum(d.totalSeamEnergy);
-        dd[1].textContent = fmtMs(d.findMs);
-        dd[2].textContent = fmtMs(d.energyMs);
-        dd[3].textContent = fmtMs(d.totalMs);
+        dd[0].innerHTML = unitHTML(fmtNum(d.totalSeamEnergy));
+        dd[1].innerHTML = unitHTML(fmtMs(d.findMs));
+        dd[2].innerHTML = unitHTML(fmtMs(d.energyMs));
+        dd[3].innerHTML = unitHTML(fmtMs(d.totalMs));
         card.append(c, title, dl);
     }
     $('cards').append(card);
 }
 
 function markBest() {
-    const cards = [...document.querySelectorAll('.card')].filter((c) => c.dataset.energy !== '');
+    const cards = [...document.querySelectorAll('.result')].filter((c) => c.dataset.energy !== '');
     if (cards.length < 2) return;
     const best = Math.min(...cards.map((c) => Number(c.dataset.energy)));
     for (const c of cards) {
         if (Math.abs(Number(c.dataset.energy) - best) <= 1e-6 * Math.max(1, best)) {
-            c.querySelector('.e').classList.add('best');
-            const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'lowest energy';
+            const b = document.createElement('small'); b.textContent = 'lowest energy';
             c.querySelector('h3').append(b);
         }
     }
@@ -359,7 +363,7 @@ $('workSize').addEventListener('change', () => {
 });
 $('file').addEventListener('change', (e) => loadFile(e.target.files[0]));
 for (const id of ['targetW', 'targetH']) $(id).addEventListener('input', updateTargetLabels);
-for (const chip of document.querySelectorAll('.chip')) {
+for (const chip of document.querySelectorAll('.preset')) {
     chip.addEventListener('click', () => {
         if (!state.original) return;
         $('targetW').value = Math.max(1, Math.round(state.original.width * Number(chip.dataset.w)));
