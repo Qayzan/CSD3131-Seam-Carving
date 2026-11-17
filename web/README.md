@@ -41,9 +41,10 @@ You can also skip installing Emscripten: every CI run builds the site and attach
 
 ## Put it online
 
-The `build-web/site` folder is a plain static website (six files plus the samples).
+**Live site (automatic):** Netlify builds the site from this repository with `netlify.toml` and `web/netlify-build.sh` (it installs Emscripten 4.0.10 and builds `web/` the same way CI does). Every push to `main`, including every merged pull request, updates the live site within a few minutes, and every pull request gets its own preview link, so a teammate can try their change before it is merged.
 
-- **Netlify by hand:** drag the folder (or the unzipped CI artifact) onto <https://app.netlify.com/drop>.
-- **Netlify automatically (CD):** add the repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` (GitHub → Settings → Secrets and variables → Actions). After that, every push to `main` that passes CI deploys the new version.
+Set-up, once (FF): Netlify → *Add new project* → *Import an existing project* → GitHub → this repository. The build settings come from `netlify.toml`, so nothing else needs to be filled in.
+
+**By hand:** the `build-web/site` folder is a plain static website (six files plus the samples). Drag it, or the unzipped CI artifact **seam-carving-web**, onto <https://app.netlify.com/drop>.
 
 Graph cut solves a max-flow problem per seam, so once it is added it is only practical on small pictures. The page warns about this and the comparison skips it above 40,000 pixels.
