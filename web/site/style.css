@@ -93,7 +93,23 @@ select {
   transition: border-color 150ms var(--ease);
 }
 select:hover { border-color: var(--text-3); }
-input[type=range] { width: 100%; margin: 4px 0 0; accent-color: var(--ink); height: 20px; }
+input[type=range] {
+  --fill: 50%;
+  width: 100%; height: 20px; margin: 4px 0 0; padding: 0; background: transparent; appearance: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 2px; border-radius: 1px;
+  background: linear-gradient(to right, var(--ink) var(--fill), var(--line-strong) var(--fill));
+}
+input[type=range]::-moz-range-track { height: 2px; border-radius: 1px; background: var(--line-strong); }
+input[type=range]::-moz-range-progress { height: 2px; border-radius: 1px; background: var(--ink); }
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 7px;
+  background: var(--surface); border: 1.5px solid var(--ink); transition: transform 120ms var(--ease);
+}
+input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 7px; background: var(--surface); border: 1.5px solid var(--ink); }
+input[type=range]:active::-webkit-slider-thumb { transform: scale(1.15); }
+input[type=range]:disabled { opacity: .45; cursor: default; }
 
 .upload {
   position: relative; display: flex; align-items: center; gap: 8px; height: 36px; margin-top: 8px; padding: 0 10px;
@@ -153,6 +169,9 @@ input[type=range] { width: 100%; margin: 4px 0 0; accent-color: var(--ink); heig
 .status.err { color: var(--cut); }
 
 /* ---------------------------------------------------------------- stage */
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 4px 0 16px; }
+.head h1 { margin: 0; font-size: 28px; line-height: 34px; font-weight: 500; letter-spacing: -.01em; }
+.head p { margin: 0; font-size: 13px; color: var(--text-2); white-space: nowrap; }
 .tabs { display: flex; align-items: center; gap: 24px; height: 40px; border-bottom: 1px solid var(--line); margin-bottom: 20px; overflow-x: auto; }
 .tab {
   position: relative; height: 40px; padding: 0; font: 400 14px var(--sans); color: var(--text-3);
@@ -165,14 +184,27 @@ input[type=range] { width: 100%; margin: 4px 0 0; accent-color: var(--ink); heig
 
 /* the cutting mat: whatever the seams removed shows the mat underneath */
 .mat {
-  padding: 32px; border-radius: 16px; background-color: var(--raised);
+  padding: 24px 32px 32px 16px; border-radius: 16px; background-color: var(--raised);
   background-image:
     linear-gradient(var(--mat-grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--mat-grid) 1px, transparent 1px);
   background-size: 16px 16px; background-position: -1px -1px;
 }
-#view { display: block; max-width: 100%; height: auto; margin: 0 auto; outline: 1px solid var(--line); outline-offset: 0; }
-#view[hidden] { display: none; }
+/* the picture sits on the mat like a sheet, with rulers along two edges */
+.sheet { display: grid; grid-template-columns: 24px minmax(0, 1fr); grid-template-rows: 24px auto; margin: 0 auto; }
+.sheet[hidden] { display: none; }
+.corner { display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-3); }
+.ruler { display: block; width: 100%; height: 100%; overflow: visible; }
+.ruler .tick { stroke: var(--text-3); stroke-width: 1; }
+.ruler .tick.minor { stroke: var(--line-strong); }
+.ruler text { fill: var(--text-3); font: 400 10px var(--mono); }
+.ruler .now { stroke: var(--cut); stroke-width: 2; }
+.ruler .goal { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 2; }
+.ruler .nowLabel { fill: var(--cut); }
+#view {
+  display: block; width: 100%; height: auto; grid-column: 2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .07);
+}
 .beforeAfter { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
 .beforeAfter[hidden] { display: none; }
 .beforeAfter figure { margin: 0; }
@@ -229,7 +261,10 @@ input[type=range] { width: 100%; margin: 4px 0 0; accent-color: var(--ink); heig
   .shell { grid-template-columns: 1fr; }
   .side { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding: 20px 16px; }
   .main { padding: 20px 16px 40px; }
-  .mat { padding: 16px; border-radius: 12px; }
+  .mat { padding: 12px 16px 16px 8px; border-radius: 12px; }
+  .sheet { grid-template-columns: 20px minmax(0, 1fr); grid-template-rows: 20px auto; }
+  .head h1 { font-size: 22px; line-height: 28px; }
+  .head { flex-direction: column; gap: 2px; }
   .readout { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .readout div:nth-child(4) { border-left: 0; padding-left: 0; }
   .readout div:nth-child(n+4) { border-top: 1px solid var(--line); }

@@ -104,6 +104,10 @@
   </aside>
 
   <main class="main">
+    <div class="head">
+      <h1 id="picTitle">Broadway Tower</h1>
+      <p class="mono" id="picSize"></p>
+    </div>
     <div class="tabs" role="tablist" aria-label="View">
       <button role="tab" class="tab" data-view="result" aria-selected="true">Result</button>
       <button role="tab" class="tab" data-view="energy" aria-selected="false">Energy map</button>
@@ -114,7 +118,12 @@
     </div>
 
     <div class="mat" id="canvasWrap">
-      <canvas id="view" aria-label="Current picture"></canvas>
+      <div class="sheet" id="sheet">
+        <span class="corner mono" aria-hidden="true">px</span>
+        <svg class="ruler top" id="rulerTop" aria-hidden="true"></svg>
+        <svg class="ruler left" id="rulerLeft" aria-hidden="true"></svg>
+        <canvas id="view" aria-label="Current picture"></canvas>
+      </div>
       <div class="beforeAfter" id="beforeAfter" hidden>
         <figure><canvas id="beforeCanvas"></canvas><figcaption>Original</figcaption></figure>
         <figure><canvas id="afterCanvas"></canvas><figcaption id="afterCaption" class="mono">Result</figcaption></figure>

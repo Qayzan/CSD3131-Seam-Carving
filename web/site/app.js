@@ -71,7 +71,9 @@ async function loadBitmap(bitmap) {
     $('targetH').max = h;
     $('targetW').value = Math.max(1, Math.round(w * 0.7));
     $('targetH').value = h;
+    state.width = 0; state.height = 0;
     updateTargetLabels();
+    updateHeading();
     $('picInfo').textContent = w === bitmap.width && h === bitmap.height ? `${w} × ${h} px` : `${bitmap.width} × ${bitmap.height} → ${w} × ${h} px`;
     resetPicture();
 }
@@ -88,6 +90,7 @@ async function loadSample() {
     setStatus('Loading picture');
     try {
         const blob = await (await fetch($('sample').value)).blob();
+        $('picTitle').textContent = $('sample').selectedOptions[0].textContent;
         await loadBitmap(await createImageBitmap(blob));
     } catch (e) {
         setStatus('Could not load the sample picture: ' + e.message, true);
@@ -97,6 +100,7 @@ async function loadSample() {
 async function loadFile(file) {
     if (!file || !file.type.startsWith('image/')) { setStatus('Choose an image file', true); return; }
     try {
+        $('picTitle').textContent = file.name.replace(/\.[^.]+$/, '');
         await loadBitmap(await createImageBitmap(file));
     } catch (e) {
         setStatus('Could not read that picture: ' + e.message, true);
@@ -120,6 +124,7 @@ function startRun(singleSeam = false) {
     if (tw > state.width || th > state.height) {
         // Only shrinking is possible, so start again from the original picture.
         pendingRun = { singleSeam };
+        setStatus('Starting again from the original picture');
         resetPicture();
         return;
     }
@@ -184,7 +189,7 @@ function setLegend() {
 function refreshView() {
     if (!state.current) return;
     const ba = state.view === 'compare';
-    view.hidden = ba;
+    $('sheet').hidden = ba;
     $('beforeAfter').hidden = !ba;
     setLegend();
     if (state.view === 'result') drawOnView(state.current);
@@ -192,7 +197,71 @@ function refreshView() {
     else worker.postMessage({ type: 'view', kind: state.view });
 }
 
+// ---------------------------------------------------------------- rulers
+const SVG = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs, text) {
+    const e = document.createElementNS(SVG, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+}
+// A ruler along one edge of the picture, in picture pixels: ticks, the
+// current size (red cut line) and the target size (dashed).
+function drawRuler(svg, horizontal, total, current, target) {
+    svg.replaceChildren();
+    const len = horizontal ? svg.clientWidth : svg.clientHeight;
+    const depth = horizontal ? svg.clientHeight : svg.clientWidth;
+    if (!len || !total) return;
+    const scale = len / total;
+    const steps = [10, 20, 25, 50, 100, 200, 250, 500, 1000];
+    const minor = steps.find((s) => s * scale >= 6) || 1000;
+    const major = steps.find((s) => s * scale >= 56 && s % minor === 0) || minor * 10;
+    const line = (pos, from, cls) => svg.append(svgEl('line', horizontal
+        ? { x1: pos, x2: pos, y1: depth - from, y2: depth, class: cls }
+        : { y1: pos, y2: pos, x1: depth - from, x2: depth, class: cls }));
+    for (let v = 0; v <= total; v += minor) {
+        const pos = Math.round(v * scale) + 0.5;
+        const isMajor = v % major === 0;
+        line(pos, isMajor ? 8 : 4, isMajor ? 'tick' : 'tick minor');
+        if (isMajor && v > 0 && v < total - major * 0.4) {
+            svg.append(svgEl('text', horizontal
+                ? { x: pos + 3, y: depth - 9 }
+                : { x: depth - 9, y: pos + 3, transform: `rotate(-90 ${depth - 9} ${pos + 3})` }, String(v)));
+        }
+    }
+    if (target < total) line(Math.round(target * scale) + 0.5, depth, 'goal');
+    if (current < total) {
+        const pos = Math.round(current * scale);
+        line(pos, depth, 'now');
+        const label = svgEl('text', horizontal ? { x: pos + 4, y: 9, class: 'nowLabel' }
+                                               : { x: 9, y: pos - 4, class: 'nowLabel', transform: `rotate(-90 9 ${pos - 4})` }, String(current));
+        svg.append(label);
+    }
+}
+function drawRulers() {
+    if (!state.original) return;
+    drawRuler($('rulerTop'), true, state.original.width, state.width || state.original.width, Number($('targetW').value));
+    drawRuler($('rulerLeft'), false, state.original.height, state.height || state.original.height, Number($('targetH').value));
+    const max = state.original.width + 24;
+    $('sheet').style.maxWidth = max + 'px';
+}
+window.addEventListener('resize', drawRulers);
+
+function setFill(input) {
+    const min = Number(input.min) || 0, max = Number(input.max) || 1;
+    input.style.setProperty('--fill', (100 * (Number(input.value) - min) / Math.max(1, max - min)) + '%');
+}
+
+function updateHeading() {
+    if (!state.original) return;
+    const o = state.original;
+    $('picSize').textContent = state.width && (state.width !== o.width || state.height !== o.height)
+        ? `${o.width} × ${o.height} → ${state.width} × ${state.height}` : `${o.width} × ${o.height}`;
+}
+
 function updateTargetLabels() {
+    setFill($('targetW')); setFill($('targetH'));
+    drawRulers();
     $('wOut').textContent = $('targetW').value + ' px';
     $('hOut').textContent = $('targetH').value + ' px';
 }
@@ -225,6 +294,8 @@ worker.onmessage = ({ data }) => {
         const img = toImageData(data.rgba, data.width, data.height);
         state.width = data.width;
         state.height = data.height;
+        drawRulers();
+        updateHeading();
         state.seamsRemoved = data.seamsRemoved;
         if (data.stats) state.run = data.stats;
         if (!data.pending) state.current = img;
