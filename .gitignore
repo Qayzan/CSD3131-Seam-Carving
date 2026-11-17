@@ -1,6 +1,8 @@
 # C++ build output (CMake build folders and loose compiler output)
 build/
 out/
+build-web/
+build-native/
 cmake-build-*/
 CMakeUserPresets.json
 *.obj

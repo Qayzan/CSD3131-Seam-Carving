@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seam Carving Studio</title>
+<meta name="description" content="Content-aware image resizing with dynamic programming, greedy and graph cut seam carving. CSD3131 Team T11.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232e74b5'/%3E%3Cpath d='M11 4c4 6-3 10 1 16s-1 8 1 8' stroke='%23ff5a4e' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M20 4c-3 6 3 10-1 16s1 8-1 8' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round' opacity='.85'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="logo" aria-hidden="true"></span>
+    <div>
+      <h1>Seam Carving Studio</h1>
+      <p class="sub">Content-aware resizing, step by step. CSD3131 Assignment 2, Team T11.</p>
+    </div>
+  </div>
+  <a class="ghost" href="#how">How it works</a>
+</header>
+
+<main class="layout">
+  <aside class="panel" aria-label="Controls">
+    <section class="group">
+      <h2>1. Picture</h2>
+      <label class="field">Sample
+        <select id="sample">
+          <option value="samples/tower.jpg">Broadway Tower (photo)</option>
+          <option value="samples/synthetic_scene.png">Synthetic scene</option>
+        </select>
+      </label>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept="image/*">
+        <span>Or drop / choose your own picture</span>
+      </label>
+      <label class="field">Working size
+        <select id="workSize">
+          <option value="480">Small (480 px long side)</option>
+          <option value="720" selected>Medium (720 px)</option>
+          <option value="1000">Large (1000 px)</option>
+          <option value="0">Original size</option>
+        </select>
+      </label>
+      <p class="hint" id="picInfo">Loading…</p>
+    </section>
+
+    <section class="group">
+      <h2>2. Target size</h2>
+      <label class="field">Width <output id="wOut"></output>
+        <input type="range" id="targetW" min="1" value="1">
+      </label>
+      <label class="field">Height <output id="hOut"></output>
+        <input type="range" id="targetH" min="1" value="1">
+      </label>
+      <div class="chips" role="group" aria-label="Quick targets">
+        <button type="button" class="chip" data-w="0.7" data-h="1">70% width</button>
+        <button type="button" class="chip" data-w="1" data-h="0.8">80% height</button>
+        <button type="button" class="chip" data-w="0.75" data-h="0.75">75% both</button>
+      </div>
+      <label class="field">Seam order
+        <select id="order">
+          <option value="0">Width first</option>
+          <option value="1">Height first</option>
+          <option value="2">Alternate</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="group">
+      <h2>3. Algorithm</h2>
+      <div id="algos" class="algos" role="radiogroup" aria-label="Algorithm"></div>
+      <label class="field">Speed
+        <select id="speed">
+          <option value="400">Slow, show every seam</option>
+          <option value="60" selected>Normal, show every seam</option>
+          <option value="0">Fast, show every seam</option>
+          <option value="-1">Instant</option>
+        </select>
+      </label>
+    </section>
+
+    <div class="actions">
+      <button type="button" id="play" class="primary">Carve</button>
+      <button type="button" id="step" title="Find and remove one seam">Step</button>
+      <button type="button" id="reset">Reset</button>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </aside>
+
+  <section class="stage" aria-label="Picture">
+    <div class="tabs" role="tablist">
+      <button role="tab" class="tab" data-view="result" aria-selected="true">Result</button>
+      <button role="tab" class="tab" data-view="energy" aria-selected="false">Energy map</button>
+      <button role="tab" class="tab" data-view="seams" aria-selected="false">Removed seams</button>
+      <button role="tab" class="tab" data-view="compare" aria-selected="false">Before / after</button>
+      <span class="spacer"></span>
+      <button type="button" id="download" class="ghost small">Download PNG</button>
+    </div>
+
+    <div class="canvasWrap" id="canvasWrap">
+      <canvas id="view" aria-label="Current picture"></canvas>
+      <div class="beforeAfter" id="beforeAfter" hidden>
+        <figure><canvas id="beforeCanvas"></canvas><figcaption>Original</figcaption></figure>
+        <figure><canvas id="afterCanvas"></canvas><figcaption id="afterCaption">Result</figcaption></figure>
+      </div>
+    </div>
+    <p class="legend" id="legend"></p>
+
+    <div class="stats" id="stats">
+      <div><span>Size</span><strong id="sSize">–</strong></div>
+      <div><span>Seams removed</span><strong id="sSeams">0</strong></div>
+      <div><span>Last seam energy</span><strong id="sLast">–</strong></div>
+      <div><span>Find seam (avg)</span><strong id="sFind">–</strong></div>
+      <div><span>Energy map (avg)</span><strong id="sEnergy">–</strong></div>
+      <div><span>Total time</span><strong id="sTotal">–</strong></div>
+    </div>
+    <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+
+    <section class="compare">
+      <div class="compareHead">
+        <div>
+          <h2>Compare the algorithms</h2>
+          <p class="hint">Runs the whole resize to the target size once per algorithm, with the same shared <code>carve()</code> loop.</p>
+        </div>
+        <button type="button" id="compareBtn">Run comparison</button>
+      </div>
+      <div class="cards" id="cards"></div>
+    </section>
+  </section>
+</main>
+
+<section class="how" id="how">
+  <h2>How it works</h2>
+  <ol>
+    <li><strong>Energy.</strong> Every pixel gets an energy: how strongly the brightness changes around it (3 × 3 Sobel filter, |G<sub>x</sub>| + |G<sub>y</sub>|). Edges are bright in the energy map, flat sky is dark.</li>
+    <li><strong>Find a seam.</strong> A vertical seam is one pixel per row, each next to the one above. <em>Dynamic programming</em> finds the seam with the lowest total energy by filling a table row by row. <em>Greedy</em> just takes the cheapest neighbour each row, which is fast but not always best. <em>Graph cut</em> turns the picture into a flow network and finds the minimum cut.</li>
+    <li><strong>Remove and repeat.</strong> The seam is removed, the energy is recalculated, and the next seam is found, until the picture reaches the target size. Horizontal seams work the same way on the transposed picture.</li>
+  </ol>
+  <p class="hint">The page runs the team’s actual C++ code, compiled to WebAssembly. Nothing is uploaded: your picture never leaves your browser.</p>
+</section>
+
+<footer class="foot">
+  <span>CSD3131 Algorithm Analysis · Team T11</span>
+  <span>Sample photo: <a href="https://commons.wikimedia.org/wiki/File:Broadway_tower_edit.jpg" target="_blank" rel="noopener">Broadway tower edit.jpg</a>, Wikimedia Commons, CC BY-SA</span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
