@@ -21,9 +21,9 @@ Taken from `Assignment 2.pdf` (100 marks + 10 bonus) and `Rubrics.pdf`. Requirem
 | R5c | **Q5(c)** Comparison of DP, greedy and graph cut | 9 | RB | `benchmarks/` + report |
 | R5d | **Q5(d)** Improvements, e.g. is the whole DP table needed? Does multithreading help? | 10 | RB | report |
 | R6 | **Q6** Project quiz, Week 13 Tue 24 Nov: closed book, team-based, 10–20 MCQs on our code and report. A score multiplier may apply (80–100% → 1.00 … < 40% → 0.70) | — | all | — |
-| R7a | **Bonus** Step-by-step visualisation with all seams shown | — | tbd | `examples/`, possible UI |
-| R7b | **Bonus** User interaction to edit image sizes | — | tbd | possible UI |
-| R7c | **Bonus** CI/CD | — | FF | `.github/workflows/ci.yml` ✅ (CI part: CMake build + CTest on Linux and Windows) |
+| R7a | **Bonus** Step-by-step visualisation with all seams shown | — | FF | `web/` demo: each seam drawn before removal, *Removed seams* view ✅ |
+| R7b | **Bonus** User interaction to edit image sizes | — | FF | `web/` demo: target-size sliders, play / pause / step, own pictures ✅ |
+| R7c | **Bonus** CI/CD | — | FF | `.github/workflows/ci.yml` ✅ (CI: CMake build + CTest on Linux and Windows; web demo built every run, CD to Netlify once the secrets are set) |
 | R8 | **Presentation** ≤ 2 min per person, ≤ 12 min total. Demo the app running. Upload a recording (e.g. YouTube) and put the link in the report | — | all | `docs/presentation/` |
 | R9a | **Report** (XSite Dropbox): team id + members with SIT IDs; answers to Item 2; algorithm, design, implementation, results/evaluation, comparison and discussion (highlight algorithm and analysis); links to GitHub code and the video; **AI usage declaration** with how AI was used and the main prompts | all | RB assembles; each owner writes their items | `docs/report/` |
 | R9b | **Other materials**: slides, test inputs/outputs (optional) | — | all | `docs/presentation/`, `examples/` |
