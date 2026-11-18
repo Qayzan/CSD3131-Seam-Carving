@@ -37,11 +37,18 @@ jobs:
   web:
     # The interactive browser demo (web/): the same C++ library compiled to
     # WebAssembly with Emscripten. The finished site is kept as a downloadable
-    # artifact of every run ("seam-carving-web"); on main it is also deployed to
-    # Netlify when the repository has the NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID
-    # secrets (Settings > Secrets and variables > Actions).
+    # artifact of every run ("seam-carving-web"). With the repository secrets
+    # NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID (Settings > Secrets and variables >
+    # Actions) it is also uploaded to Netlify:
+    #   - every push to main updates the live site;
+    #   - every pull request gets its own preview link, posted as a comment.
+    # Deploying from here (not from Netlify's own Git builds) means commits by
+    # every teammate are published, not only the Netlify account owner's.
     name: Build web demo (WebAssembly)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
@@ -67,3 +74,20 @@ jobs:
       - name: Deploy to Netlify (main only, if configured)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
         run: npx --yes netlify-cli@17 deploy --dir build-web/site --prod --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+
+      - name: Preview link for this pull request (if configured)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          npx --yes netlify-cli@17 deploy --dir build-web/site --alias "pr-$PR" \
+            --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN" \
+            --message "PR #$PR" --json > deploy.json
+          url=$(jq -r '.deploy_url' deploy.json)
+          echo "::notice title=Preview of this pull request::$url"
+          echo "### Preview of this pull request: $url" >> "$GITHUB_STEP_SUMMARY"
+          body="**Preview of this pull request:** $url (built from ${SHA::7}; updates on every push)"
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --body "$body" \
+            || gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$body"
