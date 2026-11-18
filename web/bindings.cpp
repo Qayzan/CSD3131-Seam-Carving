@@ -37,6 +37,7 @@
 #include "seam_ops.hpp"
 
 #include "dynamic_programming.hpp"  // FF: Question 1, wired in
+#include "greedy.hpp"               // HM: item 3, wired in
 #include "seam_extraction.hpp"  // KO: Graph Cut Part 2
 
 // ---- Teammates: add your own seam finder here --------------------------------
@@ -112,8 +113,7 @@ const std::vector<Algorithm>& algorithmList() {
     static const std::vector<Algorithm> list = [] {
         std::vector<Algorithm> a;
         a.push_back({"dp", "Dynamic programming", "Optimal seam, \u0398(mn) per seam", dp::findSeam});
-        // HM:  a.push_back({"greedy", "Greedy", "Cheapest neighbour row by row", greedy::findSeam});
-        // KO:  a.push_back({"graphcut", "Graph cut", "Min-cut / max-flow, slow", graphcut::findSeam});
+        a.push_back({"greedy", "Greedy", "Cheapest neighbour row by row, \u0398(m+n) per seam", greedy::findSeam});
         a.push_back({"graphcut", "Graph Cut", "Minimum-energy seam using Edmonds-Karp max-flow", graphCutFinder });
         return a;
     }();
