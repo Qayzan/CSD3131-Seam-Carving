@@ -37,6 +37,7 @@
 #include "seam_ops.hpp"
 
 #include "dynamic_programming.hpp"  // FF: Question 1, wired in
+#include "seam_extraction.hpp"  // KO: Graph Cut Part 2
 
 // ---- Teammates: add your own seam finder here --------------------------------
 // The demo is the shared base plus the DP. Each method's owner plugs in their
@@ -62,12 +63,58 @@ struct Algorithm {
     SeamFinder finder;
 };
 
+
+ // ============================================================================
+ // Graph Cut adapter -- connects Graph Cut to the shared SeamFinder interface.
+ // Owner: Kervin (Graph Cut Part 2).
+ //
+ // Converts EnergyMap into Graph Cut's Grid format, handles horizontal seams
+ // using transpose, and returns the seam in the shared team's format.
+ // ============================================================================
+
+ Seam graphCutFinder(const EnergyMap& energy, Orientation orientation) {
+     checkEnergyMap(energy);
+
+     // Horizontal seams become vertical seams after transposing.
+     EnergyMap working = (orientation == Orientation::Horizontal)
+                             ? transpose(energy)
+                             : energy;
+
+     // Convert the shared flat energy map into Graph Cut's 2D grid.
+     graphcut::Grid grid(
+         working.rows,
+         std::vector<double>(working.cols)
+     );
+
+     for (int r = 0; r < working.rows; ++r) {
+         for (int c = 0; c < working.cols; ++c) {
+             grid[r][c] = working.at(r, c);
+         }
+     }
+
+     // Run the existing Graph Cut implementation.
+     Seam seam;
+     seam.orientation = orientation;
+     seam.indices = graphcut::findVerticalGraphCutSeam(grid);
+
+     // The shared carver expects the original, unscaled seam energy.
+     seam.energy = 0.0;
+
+     for (int r = 0; r < working.rows; ++r) {
+         seam.energy += working.at(r, seam.indices[r]);
+     }
+
+     return seam;
+ }
+
+
 const std::vector<Algorithm>& algorithmList() {
     static const std::vector<Algorithm> list = [] {
         std::vector<Algorithm> a;
         a.push_back({"dp", "Dynamic programming", "Optimal seam, \u0398(mn) per seam", dp::findSeam});
         // HM:  a.push_back({"greedy", "Greedy", "Cheapest neighbour row by row", greedy::findSeam});
         // KO:  a.push_back({"graphcut", "Graph cut", "Min-cut / max-flow, slow", graphcut::findSeam});
+        a.push_back({"graphcut", "Graph Cut", "Minimum-energy seam using Edmonds-Karp max-flow", graphCutFinder });
         return a;
     }();
     return list;
