@@ -54,6 +54,11 @@
 #if __has_include("graph_cut.hpp")
 #include "graph_cut.hpp"  // KO: graphcut::findSeam
 #define HAVE_GRAPH_CUT 1
+#elif __has_include("seam_extraction.hpp")
+#include "energy.hpp"           // transpose(EnergyMap)
+#include "seam_extraction.hpp"  // KO: graphcut::findVerticalGraphCutSeam (current API)
+#include "seam_ops.hpp"         // seamEnergy
+#define HAVE_GRAPH_CUT_EXTRACTION 1
 #endif
 
 namespace {
@@ -63,6 +68,26 @@ struct Algorithm {
     SeamFinder finder;
     int maxSide;  // skip maps/images larger than this (graph cut is very slow)
 };
+
+#ifdef HAVE_GRAPH_CUT_EXTRACTION
+// Temporary bridge (same idea as graphCutViaExtraction in src/main.cpp, FF)
+// until KO provides graphcut::findSeam(EnergyMap, Orientation): copy the map
+// into KO's Grid type, find a vertical seam, and handle horizontal seams by
+// transposing. The seam energy is summed on the original map.
+Seam graphCutViaExtraction(const EnergyMap& energy, Orientation orientation) {
+    const EnergyMap map = (orientation == Orientation::Vertical) ? energy : transpose(energy);
+    graphcut::Grid grid(static_cast<std::size_t>(map.rows),
+                        std::vector<double>(static_cast<std::size_t>(map.cols)));
+    for (int r = 0; r < map.rows; ++r)
+        for (int c = 0; c < map.cols; ++c) grid[r][c] = map.at(r, c);
+    Seam seam;
+    seam.orientation = orientation;
+    seam.indices = graphcut::findVerticalGraphCutSeam(grid);
+    seam.energy = seamEnergy(energy, seam);
+    return seam;
+}
+#endif
+
 
 std::vector<Algorithm> availableAlgorithms() {
     std::vector<Algorithm> algorithms;
@@ -74,6 +99,8 @@ std::vector<Algorithm> availableAlgorithms() {
 #endif
 #ifdef HAVE_GRAPH_CUT
     algorithms.push_back({"graphcut", graphcut::findSeam, 100});
+#elif defined(HAVE_GRAPH_CUT_EXTRACTION)
+    algorithms.push_back({"graphcut", graphCutViaExtraction, 100});
 #endif
     return algorithms;
 }
