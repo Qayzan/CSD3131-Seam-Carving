@@ -5,14 +5,14 @@
 | Branch | Purpose |
 |---|---|
 | `main` | Stable integration branch. Always passes CI. Changes arrive only through pull requests. |
-| `feature/ff-dynamic-programming` | Q1 (FF) |
-| `feature/hm-greedy` | Q3 (HM) |
-| `feature/wn-graph-cut` | Q4 (WN) |
-| `docs/yn-theory` | Q2 notes (YN) |
-| `docs/ko-analysis` | Q5 notes (KO) |
-| `docs/rb-coordination` | Q6 / coordination (RB) |
+| `feature/ff-foundation` | Shared foundation (1) + DP seam carving (2) + D&C Sobel discussion (7) — FF |
+| `docs/yn-theory` | Report: DP recurrence (6) + DP complexity (8) — YN |
+| `feature/hm-greedy` | Greedy (3) + exponential proof (5) + benchmark harness — HM |
+| `feature/wn-graph-cut` | Graph Cut part 1: graph construction + max-flow (4) — WN |
+| `feature/ko-graph-cut` | Graph Cut part 2: seam extraction + DP check (4) + Graph Cut complexity (8) — KO |
+| `docs/rb-analysis-report` | Comparison (9) + improvements (10) + report assembly — RB |
 
-Branches are created by their owners when they start. They don't all need to exist on day one.
+Branches are created by their owners when they start. They don't all need to exist on day one. The branches from the first set-up (`feature/ff-dynamic-programming`, `docs/yn-theory`, `docs/ko-analysis`, `docs/rb-coordination`) follow the old task split. Their owners can delete them once their work is moved (see [team.md](team.md)).
 
 **Rules:** pull requests into `main`; no force-pushing to shared branches; merge `main` into your branch to update it. Don't rebase branches other people use. Squash-merge or merge-commit are both fine. Pick one in the repository settings and keep it.
 
@@ -30,7 +30,7 @@ git init -b main
 git config user.name  "Fauzan Fauzy"
 git config user.email "<the email on your GitHub account>"
 git add -A
-git status               # check: no .venv, __pycache__ or *.egg-info listed
+git status               # check: no build/ folder or compiled files listed
 git commit -m "Milestone 1: repository scaffolding, CI, docs and Q1 design"
 
 # 2. Install and sign in to GitHub CLI (once)
@@ -86,7 +86,7 @@ If available: **Settings → Rules → Rulesets → New branch ruleset**:
 - ✅ Restrict deletions
 - ✅ Block force pushes
 - ✅ Require a pull request before merging (1 approval; dismiss stale approvals)
-- ✅ Require status checks to pass → add **"Lint and test (Python 3.10)"** and **"Lint and test (Python 3.12)"**. These names appear after CI has run once.
+- ✅ Require status checks to pass → add **"Build and test (ubuntu-latest)"** and **"Build and test (windows-latest)"**. These names appear after CI has run once.
 - (Optional, after CODEOWNERS is filled in) ✅ Require review from Code Owners
 
 If protection is **not** available on your plan, the same rules still apply by agreement (see CONTRIBUTING.md). CI still runs on every pull request, and a failing check stays visible.

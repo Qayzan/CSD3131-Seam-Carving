@@ -1,11 +1,19 @@
-# Who must review changes to which files. Replace each @placeholder with the person's
-# GitHub username once everyone has accepted the invitation, then enable
-# "Require review from Code Owners" in the branch protection / ruleset for main.
+# Who must review changes to which files. Uncomment once everyone has accepted the
+# invitation, then enable "Require review from Code Owners" in the branch protection /
+# ruleset for main. Usernames are from docs/team.md.
 #
-# /src/seam_carving/dynamic_programming.py  @fauzan-username
-# /src/seam_carving/greedy.py               @hweemin-username
-# /src/seam_carving/graph_cut.py            @wani-username
-# /docs/theory/                             @yarni-username
-# /docs/analysis/                           @kervin-username
-# /src/seam_carving/energy.py               @fauzan-username
-# /src/seam_carving/interfaces.py           @fauzan-username
+# /src/seam_carving/image_utils.*          @Qayzan
+# /src/seam_carving/energy.*               @Qayzan
+# /src/seam_carving/interfaces.hpp         @Qayzan
+# /src/seam_carving/seam_ops.*             @Qayzan
+# /src/seam_carving/carver.*               @Qayzan
+# /src/main.cpp                            @Qayzan
+# /CMakeLists.txt                          @Qayzan
+# /src/seam_carving/dynamic_programming.*  @Qayzan
+# /src/seam_carving/greedy.*               @lhweemin
+# /benchmarks/                             @lhweemin
+# /src/seam_carving/seam_graph.*           @waneyyj
+# /src/seam_carving/max_flow.*             @waneyyj
+# /src/seam_carving/graph_cut.*            @kervino
+# /docs/analysis/                          @riffyyyy
+# /docs/report/                            @riffyyyy

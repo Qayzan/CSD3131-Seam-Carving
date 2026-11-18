@@ -12,7 +12,7 @@ labels: bug
 **How to reproduce** (image size, command, seed)
 
 ```
-<command and full error / traceback>
+<command and full error / compiler output>
 ```
 
-**Environment:** OS, Python version, `pip show numpy opencv-python-headless`
+**Environment:** OS, compiler and version (e.g. Visual Studio 2022 17.14, g++ 13), CMake version

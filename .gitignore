@@ -1,23 +1,23 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.eggs/
+# C++ build output (CMake build folders and loose compiler output)
 build/
-dist/
+out/
+build-web/
+build-native/
+cmake-build-*/
+CMakeUserPresets.json
+*.obj
+*.o
+*.exe
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.a
+*.dll
+*.so
 
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Test / lint caches
-.pytest_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-
-# Editors / OS
+# Editors / IDEs / OS
+.vs/
 .vscode/
 .idea/
 *.swp
@@ -25,7 +25,7 @@ htmlcov/
 Thumbs.db
 desktop.ini
 
-# Generated outputs (regenerate them with the scripts in examples/ and benchmarks/)
+# Generated outputs (regenerate them with the programs in examples/ and benchmarks/)
 outputs/
 examples/output/
 benchmarks/results/

@@ -1,0 +1,9 @@
+# Netlify builds and publishes the interactive web demo (web/) from this repo:
+# every push to main updates the live site, and every pull request gets its own
+# preview link. See web/README.md.
+[build]
+  command = "bash web/netlify-build.sh"
+  publish = "build-web/site"
+
+[build.environment]
+  EMSDK_VERSION = "4.0.10"
