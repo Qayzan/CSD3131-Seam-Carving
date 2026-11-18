@@ -45,12 +45,21 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/src/main.cpp)
 endif()
 
 # ---- Tests: one program per tests/test_*.cpp --------------------------------
+# A test whose name ends in _real_image takes a picture as its argument. CTest
+# gives it the small sample assets/images/test_small.png (80 x 50), which keeps
+# graph cut fast. Any pictures it saves go into the build folder.
 enable_testing()
+set(TEST_IMAGE ${CMAKE_SOURCE_DIR}/assets/images/test_small.png)
 file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/tests/test_*.cpp)
 foreach(test_source ${TEST_SOURCES})
     get_filename_component(test_name ${test_source} NAME_WE)
     add_executable(${test_name} ${test_source})
     target_link_libraries(${test_name} PRIVATE seam_carving)
     target_compile_options(${test_name} PRIVATE ${SEAM_WARNINGS})
-    add_test(NAME ${test_name} COMMAND ${test_name})
+    if(test_name MATCHES "_real_image$")
+        add_test(NAME ${test_name} COMMAND ${test_name} ${TEST_IMAGE}
+                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    else()
+        add_test(NAME ${test_name} COMMAND ${test_name})
+    endif()
 endforeach()
